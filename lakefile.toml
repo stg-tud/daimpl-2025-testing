@@ -1,0 +1,10 @@
+name = "leancheck"
+version = "0.1.0"
+defaultTargets = ["leancheck"]
+
+[[lean_lib]]
+name = "Leancheck"
+
+[[lean_exe]]
+name = "leancheck"
+root = "Main"
