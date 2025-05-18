@@ -1,4 +1,7 @@
-import Leancheck
+import Leancheck.Basic
+
+def prop_addZero (x : Int) : Bool :=
+  x + 0 == x
 
 def main : IO Unit :=
-  IO.println s!"Hello, {hello}!"
+  leanCheck prop_addZero
