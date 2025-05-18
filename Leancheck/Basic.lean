@@ -2,10 +2,24 @@ import Std
 
 open Std
 
+/--
+Generates a random `Int` in the interval [lo, hi] using the given `StdGen`.
+
+Returns a pair `(x, g')` where:
+- `x` is the random integer in the desired range
+- `g'` is the updated random generator
+-/
 def randIntInRange (g : StdGen) (lo hi : Int) : Int × StdGen :=
   let (n, g') := randNat g (lo.toNat) (hi.toNat)
   (Int.ofNat n, g')
 
+/--
+Generates a list of random `Int`s in the interval [lo, hi] of length `len`.
+
+Returns a pair `(xs, g')` where:
+- `xs` is the list of random integers
+- `g'` is the updated random generator after generating all elements
+-/
 def randIntList (g : StdGen) (len : Nat) (lo hi : Int) : List Int × StdGen :=
   match len with
   | 0 => ([], g)
