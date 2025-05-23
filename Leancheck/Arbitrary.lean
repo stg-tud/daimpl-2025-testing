@@ -6,7 +6,7 @@ Returns a pair `(x, g')` where:
 - `g'` is the updated random generator
 -/
 def randNatInRange (g : StdGen) (lo hi : Int) : Nat × StdGen :=
-  let (n, g') := randNat g (lo.toNat) (hi.toNat)
+  let (n, g') : Nat × StdGen := randNat g (lo.toNat) (hi.toNat)
   (n, g')
 
 /--
@@ -17,8 +17,10 @@ Returns a pair `(x, g')` where:
 - `g'` is the updated random generator
 -/
 def randIntInRange (g : StdGen) (lo hi : Int) : Int × StdGen :=
-  let (n, g') := randNat g (lo.toNat) (hi.toNat)
-  (Int.ofNat n, g')
+  let diff : Nat := (hi - lo).toNat
+  let (n, g') : Nat × StdGen := randNat g 0 diff
+  let n' : Int := n + lo
+  (n', g')
 
 
 class Arbitrary (α : Type) where
@@ -31,7 +33,7 @@ instance : Arbitrary Nat where
   generate g := randNatInRange g 0 100
 
 instance : Arbitrary Int where
-  generate g := randIntInRange g 0 100
+  generate g := randIntInRange g (-100) 100
 
 instance {α : Type} [Arbitrary α] : Arbitrary (List α) where
   generate g :=
