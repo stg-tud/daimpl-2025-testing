@@ -5,8 +5,8 @@ Returns a pair `(x, g')` where:
 - `x` is the random integer in the desired range
 - `g'` is the updated random generator
 -/
-def randNatInRange (g : StdGen) (lo hi : Int) : Nat × StdGen :=
-  let (n, g') : Nat × StdGen := randNat g (lo.toNat) (hi.toNat)
+def randNatInRange (g : StdGen) (lo hi : Nat) : Nat × StdGen :=
+  let (n, g') : Nat × StdGen := randNat g lo hi
   (n, g')
 
 /--
