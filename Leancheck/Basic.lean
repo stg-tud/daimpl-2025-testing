@@ -21,7 +21,7 @@ def main : IO Unit :=
   leanCheck prop_addZero
 ```
 -/
-  def leanCheck {α: Type} [Arbitrary α] [ToString α] (prop : α → Bool) (trials : Nat := 100) : IO Unit := do
+def leanCheck {α: Type} [Arbitrary α] [ToString α] (prop : α → Bool) (trials : Nat := 100) : IO Unit := do
   let mut failed : Bool := false
   let mut g := mkStdGen
   for _ in [:trials] do
