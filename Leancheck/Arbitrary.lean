@@ -34,12 +34,12 @@ instance : Arbitrary Int where
   generate g := randIntInRange g 0 100
 
 instance {α : Type} [Arbitrary α] : Arbitrary (List α) where
-  generate g := Id.run do
-    let mut g := g
-    let mut lst := []
-    let (len, _) := randNatInRange g 0 10
-    for _ in [0:len] do
-      let (x, g') := Arbitrary.generate g
-      lst := x :: lst -- append element to beginning bc of performance
-      g := g'
-    (lst, g)
+  generate g :=
+    let (len, g) := randNatInRange g 0 10
+    let rec gen : (n : Nat) → (g : StdGen) → List α × StdGen
+      | 0, g => ([], g)
+      | n + 1, g =>
+        let (x, g1) := Arbitrary.generate g
+        let (xs, g2) := gen n g1
+        (x :: xs, g2)
+    gen len g

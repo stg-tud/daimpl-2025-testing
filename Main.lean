@@ -16,4 +16,6 @@ def prop_listRevRev (x : List Int) :=
   List.reverse (List.reverse x) == x
 
 def main : IO Unit :=
-  leanCheck prop_idempotentcy
+  leanCheck prop_listRevRev
+
+#eval main
