@@ -17,10 +17,13 @@ Returns a pair `(x, g')` where:
 - `g'` is the updated random generator
 -/
 def randIntInRange (g : StdGen) (lo hi : Int) : Int × StdGen :=
-  let diff : Nat := (hi - lo).toNat
-  let (n, g') : Nat × StdGen := randNat g 0 diff
-  let n' : Int := n + lo
-  (n', g')
+  if lo > hi then
+    panic! s!"Invalid range: lo = {lo}, hi = {hi}"
+  else
+    let diff : Nat := (hi - lo).toNat
+    let (n, g') : Nat × StdGen := randNat g 0 diff
+    let n' : Int := n + lo
+    (n', g')
 
 
 class Arbitrary (α : Type) where
