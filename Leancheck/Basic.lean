@@ -36,6 +36,7 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α]
     if ¬ prop x then
       failed := true
       IO.println s!"Failed on {x}"
+      return
 
   if ¬ failed then
     IO.println "Ok, passed 100 tests."
