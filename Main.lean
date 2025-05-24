@@ -19,7 +19,7 @@ def prop_listRevRev (x : List Int) :=
   List.reverse (List.reverse x) == x
 
 def generate g :=
-    let (len, g') := randNatInRange g 0 2
+    let (len, g') := randNat g 0 2
     let rec loop (n : Nat) (acc : List Int) (g : StdGen) : List Int × StdGen :=
       match n with
       | 0 => (acc, g)
