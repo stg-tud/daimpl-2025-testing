@@ -21,11 +21,17 @@ def main : IO Unit :=
   leanCheck prop_addZero
 ```
 -/
-def leanCheck {α: Type} [Arbitrary α] [ToString α] (prop : α → Bool) (trials : Nat := 100) : IO Unit := do
+def leanCheck {α: Type} [Arbitrary α] [ToString α]
+  (prop : α → Bool)
+  (generator : (Option (StdGen → α × StdGen)) := none)
+  (trials : Nat := 100) : IO Unit := do
+
   let mut failed : Bool := false
   let mut g := mkStdGen
+  let gen := generator.getD Arbitrary.generate
+
   for _ in [:trials] do
-    let (x, g') := Arbitrary.generate g
+    let (x, g') := gen g
     g := g'
     if ¬ prop x then
       failed := true
