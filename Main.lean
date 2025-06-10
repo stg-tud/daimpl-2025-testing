@@ -15,6 +15,9 @@ def prop_intIdempotentcy (x : Int) : Bool :=
 def prop_idempotentcy (x : Bool) : Bool :=
   and x x == x
 ---------------------------------------
+def prop_float (x : Float) :=
+  x - (1.0 / (2 ^ 64)) == x
+---------------------------------------
 def prop_listRevRev (x : List Int) :=
   List.reverse (List.reverse x) == x
 
@@ -30,8 +33,11 @@ def generate g :=
 ---------------------------------------
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
----------------------------------------
+  ---------------------------------------
+
+
 def main : IO Unit := do
+  leanCheck prop_float (trials := 5000)
   leanCheck prop_listRevRev
   leanCheck prop_arrayRevRev
   leanCheck prop_listRevRev (some generate)
