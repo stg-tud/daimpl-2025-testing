@@ -72,3 +72,36 @@ def leanCheck (prop : Int → Bool) : IO Unit := do
 
   if ¬ failed then
     IO.println "Ok, passed 100 tests."
+
+namespace Leancheck
+/--
+Like `leanCheck`, but supports conditionals:
+The property returns `Option Bool` to allow skipping test cases.
+
+- `some true` → test passed
+- `some false` → test failed
+- `none` → test skipped
+-/
+def leanCheckOptional (prop : Int → Option Bool) : IO Unit := do
+  let mut failed := false
+  let mut tested := 0
+  --random number generator
+  let g := mkStdGen
+  -- create a list of 100 random integers between 0 and 100
+  let (lst, _) := randIntListIteratively g 100 0 100
+
+  -- through each rand num x, apply property 'prop x', which returns Option Bool
+  for x in lst do
+  -- check which case proprety gives
+    match prop x with
+    | some true =>
+        tested := tested + 1
+    | some false =>
+        failed := true
+        tested := tested + 1
+        IO.println s!"Failed on {x}"
+    | none => pure ()
+  if !failed then
+    IO.println s!"Ok, passed {tested} tests."
+
+end Leancheck
