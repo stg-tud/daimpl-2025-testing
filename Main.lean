@@ -33,7 +33,7 @@ def generate g :=
 ---------------------------------------
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
-  ---------------------------------------
+---------------------------------------
 
 
 def main : IO Unit := do
