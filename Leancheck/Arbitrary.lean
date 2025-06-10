@@ -14,6 +14,11 @@ def randIntInRange (g : StdGen) (lo hi : Int) : Int × StdGen :=
     let n' : Int := n + lo
     (n', g')
 
+def randomFloat (g : StdGen) : Float × StdGen :=
+  let (n, g') := randNat g 0 (2 ^ 64)
+  let floatVal : Float := n.toFloat / (2 ^ 64).toFloat
+  (floatVal, g')
+
 -- without tail recursion
 /-
 def randList {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : List α × StdGen :=
@@ -68,6 +73,9 @@ instance : Arbitrary Nat where
 
 instance : Arbitrary Int where
   generate g := randIntInRange g (-100) 100
+
+instance : Arbitrary Float where
+  generate g := randomFloat g
 
 instance {α : Type} [Arbitrary α] : Arbitrary (List α) where
   generate g := randList Arbitrary.generate g
