@@ -8,6 +8,12 @@ open Std
 Checks a given property (`prop : Int → Bool`) by running it on 100 randomly generated `Int`s
 in the interval `[0, 100]`.
 
+Parameters:
+- prop: Property to test
+- cond Conditional for gnerated test cases
+- generator: Generator to use
+- trials: Amount of tests to run
+
 Prints:
 - A failure message for each failing input
 - A success message if all tests pass
@@ -23,6 +29,7 @@ def main : IO Unit :=
 -/
 def leanCheck {α: Type} [Arbitrary α] [ToString α]
   (prop : α → Bool)
+  (cond : α → Bool := λ x : α => true)
   (generator : (Option (StdGen → α × StdGen)) := none)
   (trials : Nat := 100) : IO Unit := do
 
