@@ -39,4 +39,4 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α]
       return
 
   if ¬ failed then
-    IO.println "Ok, passed 100 tests."
+    IO.println s!"Ok, passed {trials} tests."
