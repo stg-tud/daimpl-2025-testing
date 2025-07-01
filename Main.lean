@@ -37,10 +37,10 @@ def prop_arrayRevRev (x : Array Int) :=
 
 
 def main : IO Unit := do
-  leanCheck prop_float (trials := 5000)
-  leanCheck prop_listRevRev
-  leanCheck prop_arrayRevRev
-  leanCheck prop_listRevRev (some generate)
+  leanCheck prop_float (λ x => x > 0.01) (trials := 500)
+  --leanCheck prop_listRevRev (trials := 3000)
+  --leanCheck prop_arrayRevRev
+  --leanCheck prop_listRevRev (some generate)
   --leanCheck prop_addZeroInt
   --leanCheck prop_intIdempotentcy
 

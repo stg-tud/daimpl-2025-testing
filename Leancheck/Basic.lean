@@ -29,7 +29,7 @@ def main : IO Unit :=
 -/
 def leanCheck {α: Type} [Arbitrary α] [ToString α]
   (prop : α → Bool)
-  (cond : α → Bool := λ x : α => true)
+  (cond : α → Bool := λ x => true)
   (generator : (Option (StdGen → α × StdGen)) := none)
   (trials : Nat := 100) : IO Unit := do
 
@@ -37,13 +37,21 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α]
   let mut g := mkStdGen
   let gen := generator.getD Arbitrary.generate
 
+  let mut fail : Nat := 0
+
   for _ in [:trials] do
     let (x, g') := gen g
     g := g'
+
+    if ¬ cond x then
+      fail := fail + 1
+      IO.println s!"Filter {x}"
+      continue
+
     if ¬ prop x then
       failed := true
       IO.println s!"Failed on {x}"
       return
 
   if ¬ failed then
-    IO.println s!"Ok, passed {trials} tests."
+    IO.println s!"Ok, passed {trials - fail} tests."
