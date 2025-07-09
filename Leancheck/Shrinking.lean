@@ -1,4 +1,4 @@
-def shrink {α : Type} (x : α) (prop : Bool) : α :=
+def shrink {α : Type} (x : α) : α :=
   x
 
 def shrinkNat (x: Nat) : Nat :=

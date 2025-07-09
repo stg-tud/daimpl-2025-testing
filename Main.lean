@@ -7,7 +7,7 @@ def prop_addZeroNat (x : Nat) : Bool :=
   x + 0 == x
 ---------------------------------------
 def prop_addZeroInt (x : Int) : Bool :=
-  x + 0 == x
+  x + 0 == x + 1
 ---------------------------------------
 def prop_intIdempotentcy (x : Int) : Bool :=
   x * x == x
@@ -38,10 +38,10 @@ def prop_arrayRevRev (x : Array Int) :=
 
 def main : IO Unit := do
   leanCheck prop_float (trials := 5000)
-  leanCheck prop_listRevRev
-  leanCheck prop_arrayRevRev
-  leanCheck prop_listRevRev (some generate)
-  --leanCheck prop_addZeroInt
-  --leanCheck prop_intIdempotentcy
+  --leanCheck prop_listRevRev
+  --leanCheck prop_arrayRevRev
+  --leanCheck prop_listRevRev (some generate)
+  leanCheck prop_addZeroInt
+  leanCheck prop_intIdempotentcy
 
 #eval main

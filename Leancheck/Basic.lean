@@ -22,7 +22,7 @@ def main : IO Unit :=
   leanCheck prop_addZero
 ```
 -/
-def leanCheck {α: Type} [Arbitrary α] [ToString α]
+def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (prop : α → Bool)
   (generator : (Option (StdGen → α × StdGen)) := none)
   (trials : Nat := 100) : IO Unit := do
@@ -36,8 +36,8 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α]
     g := g'
     if ¬ prop x then
       failed := true
-      let xShrinked := Shrinking.shrink x prop
-      IO.println s!"Failed on {x}"
+      let xShrinked := Shrinking.shrink x
+      IO.println s!"Failed on {x} shrinked to {xShrinked}"
       return
 
   if ¬ failed then
