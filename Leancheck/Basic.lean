@@ -1,6 +1,7 @@
 import Std
 
 import Leancheck.Arbitrary
+import Leancheck.Shrinking
 
 open Std
 
@@ -35,6 +36,7 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α]
     g := g'
     if ¬ prop x then
       failed := true
+      let xShrinked := Shrinking.shrink x prop
       IO.println s!"Failed on {x}"
       return
 
