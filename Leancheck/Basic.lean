@@ -48,7 +48,7 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
     let mut (x, g') := gen g
     g := g'
 
-    while ¬ cond x do 
+    while ¬ cond x do
       (x,g') := gen g
       g := g'
       fail := fail + 1
@@ -57,12 +57,15 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
       if fail = 5 then
         fail := 0
         timeout := timeout + 1
-        break 
+        break
 
     if ¬ prop x then
       failed := true
       let xShrinked := Shrinking.shrink x
-      IO.println s!"Failed on {x} shrinked to {xShrinked}"
+      if ¬ prop xShrinked then
+        IO.println s!"Failed on {x} shrinked to {xShrinked}"
+      else
+        IO.println s!"Failed on {x}"
       return
 
 
