@@ -34,11 +34,15 @@ def generate g :=
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
 ---------------------------------------
+def prop_revConcat (x: List Int) :=
+  List.reverse (x ++ [-1, 0, 1]) == List.reverse x ++ List.reverse [-1, 0, 1]
+  ---------------------------------------
 
 
 def main : IO Unit := do
-  leanCheck prop_float (trials := 5000)
-  --leanCheck prop_listRevRev
+  --leanCheck prop_float (λ x => x > 0.01) (trials := 500)
+  leanCheck prop_listRevRev
+  leanCheck prop_revConcat
   --leanCheck prop_arrayRevRev
   --leanCheck prop_listRevRev (some generate)
   leanCheck prop_addZeroInt
