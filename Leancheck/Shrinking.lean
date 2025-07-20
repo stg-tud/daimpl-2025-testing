@@ -11,7 +11,14 @@ def shrinkFloat (x : Float) : Float :=
   if x == 0.0 then 0.0 else if x > 0.0 then 0.1 else -0.1
 
 def shrinkList {α : Type} (shrinker : α → α) (xs : List α) : List α :=
-  xs
+  (xs.take 2).map shrinker
+
+def shrinkArray {α : Type} (shrinker : α → α) (xs : Array α) : Array α :=
+  ((xs.toList.take 2).map shrinker).toArray
+
+def shrinkOptional {α : Type} (shrinker : α → α) (n : Option α) : Option α :=
+  n.map shrinker
+
 
 class Shrinking (α : Type) where
   shrink : α → α
@@ -30,10 +37,9 @@ instance : Shrinking Float where
 
 instance {α : Type} [Shrinking α] : Shrinking (List α) where
   shrink xs := shrinkList Shrinking.shrink xs
-/-
+
 instance {α : Type} [Shrinking α] : Shrinking (Array α) where
-  shrink g := randArray Arbitrary.generate g
+  shrink xs := shrinkArray Shrinking.shrink xs
 
 instance {α : Type} [Shrinking α] : Shrinking (Option α) where
-  shrink g := randOptional Arbitrary.generate g
--/
+  shrink n := shrinkOptional Shrinking.shrink n
