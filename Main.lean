@@ -7,7 +7,7 @@ def prop_addZeroNat (x : Nat) : Bool :=
   x + 0 == x
 ---------------------------------------
 def prop_addZeroInt (x : Int) : Bool :=
-  x + 0 == x
+  x + 0 == x + 1
 ---------------------------------------
 def prop_intIdempotentcy (x : Int) : Bool :=
   x * x == x
@@ -34,14 +34,18 @@ def generate g :=
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
 ---------------------------------------
+def prop_revConcat (x: List Int) :=
+  List.reverse (x ++ [-1, 0, 1]) == List.reverse x ++ List.reverse [-1, 0, 1]
+  ---------------------------------------
 
 
 def main : IO Unit := do
-  leanCheck prop_float (λ x => x > 0.01) (trials := 500)
-  --leanCheck prop_listRevRev (trials := 3000)
+  --leanCheck prop_float (λ x => x > 0.01) (trials := 500)
+  leanCheck prop_listRevRev
+  leanCheck prop_revConcat
   --leanCheck prop_arrayRevRev
   --leanCheck prop_listRevRev (some generate)
-  --leanCheck prop_addZeroInt
-  --leanCheck prop_intIdempotentcy
+  leanCheck prop_addZeroInt
+  leanCheck prop_intIdempotentcy
 
 #eval main
