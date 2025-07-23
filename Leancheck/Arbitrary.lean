@@ -61,6 +61,11 @@ def randOptional {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : Opti
   else
     (none, g')
 
+def randTupel {α β : Type} (genA : StdGen → α × StdGen) (genB : StdGen → β × StdGen) (g : StdGen) : (α × β) × StdGen :=
+  let (a, g1) := genA g
+  let (b, g2) := genB g1
+  ((a, b), g2)
+
 
 class Arbitrary (α : Type) where
   generate : StdGen → α × StdGen
@@ -85,3 +90,6 @@ instance {α : Type} [Arbitrary α] : Arbitrary (Array α) where
 
 instance {α : Type} [Arbitrary α] : Arbitrary (Option α) where
   generate g := randOptional Arbitrary.generate g
+
+instance {α β : Type} [Arbitrary α] [Arbitrary β] : Arbitrary (α × β) where
+  generate g := randTupel Arbitrary.generate Arbitrary.generate g
