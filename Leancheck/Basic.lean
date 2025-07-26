@@ -63,7 +63,8 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
       failed := true
       let xShrinked := Shrinking.shrink x
       if ¬ prop xShrinked then
-        IO.println s!"Failed on {x} shrinked to {xShrinked}"
+        -- IO.println s!"Failed on {x} shrinked to {xShrinked}"
+        throw (.userError s!"Failed on {x} shrinked to {xShrinked}")
       else
         IO.println s!"Failed on {x}"
       return
