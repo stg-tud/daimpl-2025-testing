@@ -2,8 +2,14 @@ name = "leancheck"
 version = "0.1.0"
 defaultTargets = ["leancheck"]
 
+testDriver = "Examples"
+
 [[lean_lib]]
 name = "Leancheck"
+
+[[lean_lib]]
+name = "Examples"
+srcDir = "Leancheck/examples"
 
 [[lean_exe]]
 name = "leancheck"
