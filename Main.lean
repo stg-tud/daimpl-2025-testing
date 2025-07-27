@@ -34,9 +34,10 @@ def generate g :=
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
 ---------------------------------------
-def prop_revConcat (x: List Int) :=
-  List.reverse (x ++ [-1, 0, 1]) == List.reverse x ++ List.reverse [-1, 0, 1]
-  ---------------------------------------
+def prop_revConcat (x: List Int × List Int) :=
+  let (x1, x2) := x
+  List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
+---------------------------------------
 
 
 def main : IO Unit := do

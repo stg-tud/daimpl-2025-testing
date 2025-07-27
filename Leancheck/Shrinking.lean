@@ -19,6 +19,10 @@ def shrinkArray {α : Type} (shrinker : α → α) (xs : Array α) : Array α :=
 def shrinkOptional {α : Type} (shrinker : α → α) (n : Option α) : Option α :=
   n.map shrinker
 
+def shrinkPair {α β : Type} (shrinkerA : α → α) (shrinkerB : β → β) (n : α × β) : (α × β):=
+  let (a, b) := n
+  (shrinkerA a, shrinkerB b)
+
 
 class Shrinking (α : Type) where
   shrink : α → α
@@ -43,3 +47,6 @@ instance {α : Type} [Shrinking α] : Shrinking (Array α) where
 
 instance {α : Type} [Shrinking α] : Shrinking (Option α) where
   shrink n := shrinkOptional Shrinking.shrink n
+
+instance {α β : Type} [Shrinking α] [Shrinking β] : Shrinking (α × β) where
+  shrink n := shrinkPair Shrinking.shrink Shrinking.shrink n
