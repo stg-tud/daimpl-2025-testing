@@ -1,7 +1,12 @@
 import Leancheck.Basic
 import Leancheck.Arbitrary
-import Std
+import Mathlib.Data.Tree.Basic
+import Mathlib.Tactic
 open Std
+open Tree
+
+example (n : ℕ) : n + 0 = n := by simp
+
 ---------------------------------------
 def prop_addZeroNat (x : Nat) : Bool :=
   x + 0 == x
@@ -39,6 +44,13 @@ def prop_revConcat (x: List Int × List Int) :=
   List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
 ---------------------------------------
 
+def myTree : Tree Nat :=
+  node 1
+    (node 2 nil nil)
+    (node 3 (node 4 nil nil) nil)
+
+#eval myTree
+#eval myTree.height
 
 def main : IO Unit := do
   --leanCheck prop_float (λ x => x > 0.01) (trials := 500)

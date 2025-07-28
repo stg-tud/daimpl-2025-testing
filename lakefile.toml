@@ -14,3 +14,7 @@ srcDir = "Leancheck/examples"
 [[lean_exe]]
 name = "leancheck"
 root = "Main"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
