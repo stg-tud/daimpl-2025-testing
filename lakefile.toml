@@ -11,6 +11,3 @@ name = "Leancheck"
 name = "Examples"
 srcDir = "Leancheck/examples"
 
-[[lean_exe]]
-name = "leancheck"
-root = "Main"
