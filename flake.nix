@@ -12,7 +12,7 @@
     pkgs = import nixpkgs { inherit system; };
     nvim = nixNeovim.outputs.packages.${system}.lean;
   in {
-    devShells.${system}.default = pkgs.mkShell {
+    devShells.${system}.default = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } {
       # Interactive packages
       packages = with pkgs; [
         nvim
