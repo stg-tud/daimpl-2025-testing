@@ -61,8 +61,7 @@ def prop_revConcat (x: List Int × List Int) :=
 
 #eval leanCheck prop_arrayRevRev
 
--- TODO: Make custom generators work, again(?)
-#eval leanCheck prop_listRevRev (some generate)
+#eval leanCheck prop_listRevRev (generator := some generate)
 
 #eval leanCheck prop_addZeroInt
 
