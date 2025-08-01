@@ -11,7 +11,7 @@ testDriver = "Tests"
 name = "leancheck"
 git = "https://github.com/stg-tud/daimpl-2025-testing.git"
 
-[[lean_lib]]
+[[lean_exe]]
 name = "Tests"
 globs = ["Tests.+"]
 ```
