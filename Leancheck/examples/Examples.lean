@@ -47,10 +47,12 @@ def prop_revConcat (x: List Int × List Int) :=
 def main := do
   parseTestOutput $ leanCheck (λ x => x + 1 = x + 1)
   parseTestOutput $ leanCheck (λ x => x + 1 = x + 0)
-  parseTestOutput $ leanCheck prop_float (λ x => x > 0.01) (trials := 500)
+  parseTestOutput $ leanCheck prop_float (λ x => x > 20) (trials := 500)
   parseTestOutput $ leanCheck prop_listRevRev
   parseTestOutput $ leanCheck prop_revConcat
   parseTestOutput $ leanCheck prop_arrayRevRev
   parseTestOutput $ leanCheck prop_listRevRev (generator := some generate)
   parseTestOutput $ leanCheck prop_addZeroInt
   parseTestOutput $ leanCheck prop_intIdempotentcy
+
+#eval main

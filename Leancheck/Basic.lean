@@ -6,10 +6,11 @@ import Leancheck.Shrinking
 open Std
 
 structure TestOutput (α : Type) where
-  runs   : Nat      := 0
-  iter   : Nat      := 0
-  ex     : Option α := none
-  shrink : Option α := none
+  trial    : Nat      := 0
+  iter    : Nat      := 0
+  ex      : Option α := none
+  shrink  : Option α := none
+  timeout : Bool     := false
 deriving Inhabited
 
 -- TODO: Prove termination
@@ -26,7 +27,7 @@ partial def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (fails : Nat := 0) : TestOutput α := Id.run do 
 
   -- Check if done
-  if iteration = trials then return { runs := trials, iter := iteration }
+  if iteration = trials then return { trial := trials, iter := iteration }
 
   -- Get generator and value
   let g := mkStdGen
@@ -35,27 +36,28 @@ partial def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
 
   -- Check conditional
   if ¬ cond x then
-    if fails <= 5 then
-      leanCheck prop cond generator trials iteration (fails + 1)
+    if fails = 5 then
+      return { trial := trials, iter := iteration, timeout := true}
     else
-      leanCheck prop cond generator trials (iteration + 1) 0
+      leanCheck prop cond generator (trials + 1) iteration (fails + 1)
   else
     -- Check property
     if ¬ prop x then
-      let ex : TestOutput α := { runs := trials, iter := 0, ex := some x }
+      let ex : TestOutput α := { trial := trials, ex := some x }
 
       if ¬ prop (Shrinking.shrink x) then
         return {ex with shrink := some (Shrinking.shrink x)}
       else
         return ex
     else 
-      leanCheck prop cond generator trials (iteration + 1) 0
+      leanCheck prop cond generator trials (iteration + 1)
 
 /-
   Parse TestOutput and print human-readable version
 -/
 def parseTestOutput (x : TestOutput α) [ToString α] : IO Unit :=
   match x with
-  | { runs := _ , iter := _ , ex := none   , shrink := _ }      => IO.println s!"Success: {x.runs} tests passed"
-  | { runs := _ , iter := _ , ex := some a , shrink := none }   => IO.println s!"Failure: Counterexample {a} found, not shrinkable"
-  | { runs := _ , iter := _ , ex := some a , shrink := some b } => IO.println s!"Failure: Counterexample {a} found, shrinkable to {b}"
+  | { trial := _ , iter := _ , ex := _      , shrink := _ , timeout := true } => IO.println s!"Failure: Tests have timed out. {x.iter}/{x.trial} have been tested"
+  | { trial := _ , iter := _ , ex := none   , shrink := _ , timeout := false}      => IO.println s!"Success: {x.iter}/{x.trial} passed"
+  | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure: Counterexample {a} found, not shrinkable"
+  | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure: Counterexample {a} found, shrinkable to {b}"
