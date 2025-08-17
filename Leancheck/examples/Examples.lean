@@ -44,26 +44,15 @@ def prop_revConcat (x: List Int × List Int) :=
   let (x1, x2) := x
   List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
 
---------
+def main := do
+  parseTestOutput $ leanCheck (λ x => x + 1 = x + 1)
+  parseTestOutput $ leanCheck (λ x => x + 1 = x + 0)
+  parseTestOutput $ leanCheck prop_float (λ x => x > 20) (trials := 500)
+  parseTestOutput $ leanCheck prop_listRevRev
+  parseTestOutput $ leanCheck prop_revConcat
+  parseTestOutput $ leanCheck prop_arrayRevRev
+  parseTestOutput $ leanCheck prop_listRevRev (generator := some generate)
+  parseTestOutput $ leanCheck prop_addZeroInt
+  parseTestOutput $ leanCheck prop_intIdempotentcy
 
--- Example for a successful unit test
-#eval leanCheck (λ x => x + 1 = x + 1)
-
--- Example for a failing unit test
-#eval leanCheck (λ x => x + 1 = x + 0)
-
--- Taken from Main.lean
-#eval leanCheck prop_float (λ x => x > 0.01) (trials := 500)
-
-#eval leanCheck prop_listRevRev
-
-#eval leanCheck prop_revConcat
-
-#eval leanCheck prop_arrayRevRev
-
-#eval leanCheck prop_listRevRev (generator := some generate)
-
-#eval leanCheck prop_addZeroInt
-
-#eval leanCheck prop_intIdempotentcy
-
+#eval main

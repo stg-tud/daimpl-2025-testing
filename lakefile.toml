@@ -7,7 +7,7 @@ testDriver = "Examples"
 [[lean_lib]]
 name = "Leancheck"
 
-[[lean_lib]]
+[[lean_exe]]
 name = "Examples"
 srcDir = "Leancheck/examples"
 
