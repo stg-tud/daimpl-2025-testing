@@ -17,29 +17,27 @@ deriving Inhabited
 /-
   Main method to check a property of a function
 -/
-set_option linter.unusedVariables false in 
-partial def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (prop : α → Bool)
-  (cond : α → Bool := λ x => true)
-  (generator : (Option (StdGen → α × StdGen)) := none)
+  (cond : α → Bool := λ _ => true)
+  (generatorFunc : StdGen → α × StdGen)
+  (g : StdGen)
   (trials : Nat := 100)
   (iteration : Nat := 0)
-  (fails : Nat := 0) : TestOutput α := Id.run do 
+  (fails : Nat := 0) : TestOutput α := Id.run do
 
   -- Check if done
   if iteration = trials then return { trial := trials, iter := iteration }
 
   -- Get generator and value
-  let g := mkStdGen
-  let gen := generator.getD Arbitrary.generate
-  let (x,g') := gen g
+  let (x, g') := generatorFunc g
 
   -- Check conditional
   if ¬ cond x then
     if fails = 5 then
       return { trial := trials, iter := iteration, timeout := true}
     else
-      leanCheck prop cond generator (trials + 1) iteration (fails + 1)
+      leanCheckCore prop cond generatorFunc g' (trials + 1) iteration (fails + 1)
   else
     -- Check property
     if ¬ prop x then
@@ -49,8 +47,8 @@ partial def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
         return {ex with shrink := some (Shrinking.shrink x)}
       else
         return ex
-    else 
-      leanCheck prop cond generator trials (iteration + 1)
+    else
+      leanCheckCore prop cond generatorFunc g' trials (iteration + 1)
 
 /-
   Parse TestOutput and print human-readable version
@@ -61,3 +59,16 @@ def parseTestOutput (x : TestOutput α) [ToString α] : IO Unit :=
   | { trial := _ , iter := _ , ex := none   , shrink := _ , timeout := false}      => IO.println s!"Success: {x.iter}/{x.trial} passed"
   | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure: Counterexample {a} found, not shrinkable"
   | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure: Counterexample {a} found, shrinkable to {b}"
+
+def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+  (prop : α → Bool)
+  (cond : α → Bool := λ _ => true)
+  (generator : (Option (StdGen → α × StdGen)) := none)
+  (trials : Nat := 100)
+  (iteration : Nat := 0)
+  (fails : Nat := 0) : IO Unit := do
+
+  let g := mkStdGen
+  let gen := generator.getD Arbitrary.generate
+
+  parseTestOutput $ leanCheckCore prop cond gen g trials iteration fails
