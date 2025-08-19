@@ -64,11 +64,9 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (prop : α → Bool)
   (cond : α → Bool := λ _ => true)
   (generator : (Option (StdGen → α × StdGen)) := none)
-  (trials : Nat := 100)
-  (iteration : Nat := 0)
-  (fails : Nat := 0) : IO Unit := do
+  (trials : Nat := 100) : IO Unit := do
 
   let g := mkStdGen
   let gen := generator.getD Arbitrary.generate
 
-  parseTestOutput $ leanCheckCore prop cond gen g trials iteration fails
+  parseTestOutput $ leanCheckCore prop cond gen g trials (iteration := 0) (fails := 0)
