@@ -20,6 +20,7 @@ deriving Inhabited
 partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (prop : α → Bool)
   (cond : α → Bool := λ _ => true)
+  (map : α → α := id)
   (generatorFunc : StdGen → α × StdGen)
   (g : StdGen)
   (trials : Nat := 100)
@@ -31,24 +32,25 @@ partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
 
   -- Get generator and value
   let (x, g') := generatorFunc g
+  let y := map x
 
   -- Check conditional
-  if ¬ cond x then
+  if ¬ cond y then
     if fails = 5 then
       return { trial := trials, iter := iteration, timeout := true}
     else
-      leanCheckCore prop cond generatorFunc g' (trials + 1) iteration (fails + 1)
+      leanCheckCore prop cond map generatorFunc g' (trials + 1) iteration (fails + 1)
   else
     -- Check property
-    if ¬ prop x then
-      let ex : TestOutput α := { trial := trials, ex := some x }
+    if ¬ prop y then
+      let ex : TestOutput α := { trial := trials, ex := some y }
 
-      if ¬ prop (Shrinking.shrink x) then
-        return {ex with shrink := some (Shrinking.shrink x)}
+      if ¬ prop (Shrinking.shrink y) then
+        return {ex with shrink := some (Shrinking.shrink y)}
       else
         return ex
     else
-      leanCheckCore prop cond generatorFunc g' trials (iteration + 1)
+      leanCheckCore prop cond map generatorFunc g' trials (iteration + 1)
 
 /-
   Parse TestOutput and print human-readable version
@@ -63,10 +65,11 @@ def parseTestOutput (x : TestOutput α) [ToString α] : IO Unit :=
 def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (prop : α → Bool)
   (cond : α → Bool := λ _ => true)
+  (map : α → α := id)
   (generator : (Option (StdGen → α × StdGen)) := none)
   (trials : Nat := 100) : IO Unit := do
 
   let g := mkStdGen
   let gen := generator.getD Arbitrary.generate
 
-  parseTestOutput $ leanCheckCore prop cond gen g trials (iteration := 0) (fails := 0)
+  parseTestOutput $ leanCheckCore prop cond map gen g trials (iteration := 0) (fails := 0)
