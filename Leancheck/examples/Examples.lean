@@ -45,15 +45,14 @@ def prop_revConcat (x: List Int × List Int) :=
   List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
 
 def main := do
-  leanCheck (λ x => x + 1 = x + 1)
-  leanCheck (λ x => x + 1 = x + 1)
-  leanCheck (λ x => x + 1 = x + 0)
-  leanCheck prop_float (λ x => x > 20) (trials := 500)
-  leanCheck prop_listRevRev
-  leanCheck prop_revConcat
-  leanCheck prop_arrayRevRev
-  leanCheck prop_listRevRev (generator := some generate)
-  leanCheck prop_addZeroInt
-  leanCheck prop_intIdempotentcy
+  leanCheck "True Lambda" (λ x => x + 1 = x + 1)
+  leanCheck "False Lambda" (λ x => x + 1 = x + 0)
+  leanCheck "Float" prop_float (λ x => x > 20) (trials := 500)
+  leanCheck "Lists" prop_listRevRev
+  leanCheck "Pair of Lists" prop_revConcat
+  leanCheck "Array of Ints" prop_arrayRevRev
+  leanCheck "Other generator" prop_listRevRev (generator := some generate)
+  -- leanCheck prop_addZeroInt
+  -- leanCheck prop_intIdempotentcy
 
 #eval main
