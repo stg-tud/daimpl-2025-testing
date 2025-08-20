@@ -1,7 +1,7 @@
 import Std
 
 import Leancheck.Arbitrary
-import Leancheck.Shrinking
+import Leancheck.ManualShrinking
 
 open Std
 
@@ -17,7 +17,7 @@ deriving Inhabited
 /-
   Main method to check a property of a function
 -/
-partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
   (cond : α → Bool := λ _ => true)
   (map : α → α := id)
@@ -45,8 +45,8 @@ partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
     if ¬ prop y then
       let ex : TestOutput α := { trial := trials, ex := some y }
 
-      if ¬ prop (Shrinking.shrink y) then
-        return {ex with shrink := some (Shrinking.shrink y)}
+      if ¬ prop (ManualShrinking.shrink x prop map) then
+        return {ex with shrink := some (ManualShrinking.shrink x prop map)}
       else
         return ex
     else
@@ -62,7 +62,7 @@ def parseTestOutput (x : TestOutput α) [ToString α] : IO Unit :=
   | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure: Counterexample {a} found, not shrinkable"
   | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure: Counterexample {a} found, shrinkable to {b}"
 
-def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+def leanCheck {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
   (cond : α → Bool := λ _ => true)
   (map : α → α := id)

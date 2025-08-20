@@ -44,6 +44,9 @@ def prop_revConcat (x: List Int × List Int) :=
   let (x1, x2) := x
   List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
 
+def toEvenNat (x : Nat) : Nat :=
+  x * 2
+
 def toEvenInt (x : Int) : Int :=
   x * 2
 
@@ -51,15 +54,16 @@ def toEvenIntPair : (List Int × List Int) → (List Int × List Int) :=
   Prod.map (List.map toEvenInt) (List.map toEvenInt)
 
 def main := do
-  leanCheck (λ x => x + 1 = x + 1)
+  leanCheck (λ x => x * 1 = x * 2) (map := toEvenNat)
+  leanCheck (λ x => x * 1 = x * 2) (map := toEvenInt)
   leanCheck (λ x => x + 1 = x + 1)
   leanCheck (λ x => x + 1 = x + 0)
-  leanCheck prop_float (λ x => x > 20) (trials := 500)
-  leanCheck prop_listRevRev
-  leanCheck prop_revConcat (map := toEvenIntPair)
-  leanCheck prop_arrayRevRev
-  leanCheck prop_listRevRev (generator := some generate)
-  leanCheck prop_addZeroInt
+  --leanCheck prop_float (λ x => x > 20) (trials := 500)
+  --leanCheck prop_listRevRev
+  --leanCheck prop_revConcat (map := toEvenIntPair)
+  --leanCheck prop_arrayRevRev
+  --leanCheck prop_listRevRev (generator := some generate)
+  leanCheck prop_addZeroInt (map := toEvenInt)
   leanCheck prop_intIdempotentcy
 
 #eval main
