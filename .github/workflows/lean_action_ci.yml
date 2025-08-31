@@ -16,4 +16,5 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           auto-config: "false"
+          test: "true"
           check-reservoir-eligibility: "true"
