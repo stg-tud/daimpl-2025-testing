@@ -8,7 +8,7 @@ import Std
 
 open Std
 
--- Define properties or custom generators
+-- Properties defined prior
 def prop_addZeroNat (x : Nat) : Bool :=
   x + 0 == x
 
@@ -27,6 +27,14 @@ def prop_float (x : Float) :=
 def prop_listRevRev (x : List Int) :=
   List.reverse (List.reverse x) == x
 
+def prop_arrayRevRev (x : Array Int) :=
+  Array.reverse (Array.reverse x) == x
+
+def prop_revConcat (x: List Int × List Int) :=
+  let (x1, x2) := x
+  List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
+
+-- Custom generator
 def generate g :=
     let (len, g') := randNat g 0 2
     let rec loop (n : Nat) (acc : List Int) (g : StdGen) : List Int × StdGen :=
@@ -37,22 +45,21 @@ def generate g :=
         loop n (x :: acc) g''
     loop len [] g'
 
-def prop_arrayRevRev (x : Array Int) :=
-  Array.reverse (Array.reverse x) == x
+-- Define test suites as functions
+def testLambda := do
+  check "True lambda" (λ x => x + 1 = x + 1)
+  check "False lambda" (λ x => x + 1 = x + 0)
 
-def prop_revConcat (x: List Int × List Int) :=
-  let (x1, x2) := x
-  List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
+def testProp := do
+  check "Float" prop_float (λ x => x > 20) (trials := 500)
+  check "Lists" prop_listRevRev
+  check "Pair of lists" prop_revConcat
+  check "Array of int" prop_arrayRevRev
+  check "Other generator" prop_listRevRev (generator := some generate)
 
-def main := do
-  leanCheck "True Lambda" (λ x => x + 1 = x + 1)
-  leanCheck "False Lambda" (λ x => x + 1 = x + 0)
-  leanCheck "Float" prop_float (λ x => x > 20) (trials := 500)
-  leanCheck "Lists" prop_listRevRev
-  leanCheck "Pair of Lists" prop_revConcat
-  leanCheck "Array of Ints" prop_arrayRevRev
-  leanCheck "Other generator" prop_listRevRev (generator := some generate)
-  -- leanCheck prop_addZeroInt
-  -- leanCheck prop_intIdempotentcy
-
-#eval main
+def main (args : List String) := do
+  match args with
+  | [] => return
+  | "lambda" :: args => testLambda; main args
+  | "prop" :: args => testProp; main args
+  | _ => testLambda; testProp
