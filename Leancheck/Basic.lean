@@ -60,7 +60,7 @@ def parseTestOutput (name : String) (x : TestOutput α) [ToString α] : IO Unit 
   | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure \"{name}\": Counterexample {a} found, not shrinkable"
   | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure \"{name}\": Counterexample {a} found, shrinkable to {b}"
 
-def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+def check {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
   (name : String)
   (prop : α → Bool)
   (cond : α → Bool := λ _ => true)
