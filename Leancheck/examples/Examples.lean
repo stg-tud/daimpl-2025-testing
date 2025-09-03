@@ -37,6 +37,18 @@ def generate g :=
         loop n (x :: acc) g''
     loop len [] g'
 
+partial def myShrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Nat :=
+  let rec loop : Nat → Nat → Nat
+    | 0, best =>
+      let y0 := map 0
+      let best := if ¬ prop y0 ∧ (y0 < best) then y0 else best
+      best
+    | n, best =>
+      let y := map n
+      let best := if ¬ prop y ∧ (y < best) then y else best
+      loop (n / 2) best
+  loop x (map x)
+
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
 
@@ -57,7 +69,7 @@ def main := do
   leanCheck (λ x => x * 1 = x * 2) (map := toEvenNat)
   leanCheck (λ x => x * 1 = x * 2) (map := toEvenInt)
   leanCheck (λ x => x + 1 = x + 1)
-  leanCheck (λ x => x + 1 = x + 0)
+  leanCheck (λ x => x + 1 = x + 0) (shrinker := myShrinkNat)
   --leanCheck prop_float (λ x => x > 20) (trials := 500)
   --leanCheck prop_listRevRev
   --leanCheck prop_revConcat (map := toEvenIntPair)
