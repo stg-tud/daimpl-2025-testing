@@ -1,28 +1,28 @@
-def shrinkNat (x: Nat) (prop : Nat → Bool) (map : Nat → Nat) : Nat :=
+def shrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Nat :=
   let rec loop : Nat → Option Nat → Nat
     | 0, best =>
       let y0 := map 0
-      let best := if ¬ prop y0 then some y0 else best
+      let best := if ¬ prop y0 ∧ (y0 < best.getD x) then some y0 else best
       best.getD x
     | (n+1), best =>
       let y := map (n+1)
-      let best := if ¬ prop y then some y else best
+      let best := if ¬ prop y ∧ (y < best.getD x) then some y else best
       loop n best
-  loop x none
+  loop x (map x)
 
-def shrinkInt (x: Int) (prop : Int → Bool) (map : Int → Int) : Int :=
+def shrinkInt (x : Int) (prop : Int → Bool) (map : Int → Int) : Int :=
   let s : Int := if x ≥ 0 then (1 : Int) else (-1)
-  let rec loop : Nat → Option Int → Int
+  let rec loop : Nat → Int → Int
     | 0, best =>
       let y0 := map 0
-      let best := if ¬ prop y0 then some y0 else best
-      best.getD x
+      let best := if ¬ prop y0 ∧ (Int.natAbs y0 < Int.natAbs best) then y0 else best
+      best
     | (k+1), best =>
       let cand : Int := s * Int.ofNat (k+1)
       let y := map cand
-      let best := if ¬ prop y then some y else best
+      let best := if ¬ prop y ∧ (Int.natAbs y < Int.natAbs best) then y else best
       loop k best
-  loop (Int.natAbs x) none
+  loop (Int.natAbs x) (map x)
 
 def shrinkPair {α β : Type}
   (shrA : α → (α → Bool) → (α → α) → α)
