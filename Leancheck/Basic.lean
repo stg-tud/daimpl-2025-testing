@@ -19,13 +19,12 @@ deriving Inhabited
 -/
 partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
-  (cond : α → Bool := λ _ => true)
   (map : α → α := id)
   (generatorFunc : StdGen → α × StdGen)
+  (shrinkingFunc : α → (prop : α → Bool) → (map : α → α) → α)
   (g : StdGen)
   (trials : Nat := 100)
-  (iteration : Nat := 0)
-  (fails : Nat := 0) : TestOutput α := Id.run do
+  (iteration : Nat := 0) : TestOutput α := Id.run do
 
   -- Check if done
   if iteration = trials then return { trial := trials, iter := iteration }
@@ -34,23 +33,16 @@ partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [ManualShrinki
   let (x, g') := generatorFunc g
   let y := map x
 
-  -- Check conditional
-  if ¬ cond y then
-    if fails = 5 then
-      return { trial := trials, iter := iteration, timeout := true}
-    else
-      leanCheckCore prop cond map generatorFunc g' (trials + 1) iteration (fails + 1)
-  else
-    -- Check property
+  -- Check property
     if ¬ prop y then
       let ex : TestOutput α := { trial := trials, ex := some y }
 
-      if ¬ prop (ManualShrinking.shrink x prop map) then
-        return {ex with shrink := some (ManualShrinking.shrink x prop map)}
+      if ¬ prop (shrinkingFunc x prop map) then
+        return {ex with shrink := some (shrinkingFunc x prop map)}
       else
         return ex
     else
-      leanCheckCore prop cond map generatorFunc g' trials (iteration + 1)
+      leanCheckCore prop map generatorFunc shrinkingFunc g' trials (iteration + 1)
 
 /-
   Parse TestOutput and print human-readable version
@@ -64,12 +56,13 @@ def parseTestOutput (x : TestOutput α) [ToString α] : IO Unit :=
 
 def leanCheck {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
-  (cond : α → Bool := λ _ => true)
   (map : α → α := id)
   (generator : (Option (StdGen → α × StdGen)) := none)
+  (shrinker : (Option (α → (prop : α → Bool) → (map : α → α) → α)) := none)
   (trials : Nat := 100) : IO Unit := do
 
   let g := mkStdGen
-  let gen := generator.getD Arbitrary.generate
+  let generatorFunc := generator.getD Arbitrary.generate
+  let shrinkingFunc := shrinker.getD ManualShrinking.shrink
 
-  parseTestOutput $ leanCheckCore prop cond map gen g trials (iteration := 0) (fails := 0)
+  parseTestOutput $ leanCheckCore prop map generatorFunc shrinkingFunc g trials (iteration := 0)
