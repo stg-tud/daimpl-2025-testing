@@ -47,7 +47,7 @@ partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [ManualShrinki
 /-
   Parse TestOutput and print human-readable version
 -/
-def parseTestOutput (x : TestOutput α) [ToString α] : IO Unit :=
+def parseTestOutput{α: Type} (x : TestOutput α) [ToString α] : IO Unit :=
   match x with
   | { trial := _ , iter := _ , ex := _      , shrink := _ , timeout := true } => IO.println s!"Failure: Tests have timed out. {x.iter}/{x.trial} have been tested"
   | { trial := _ , iter := _ , ex := none   , shrink := _ , timeout := false}      => IO.println s!"Success: {x.iter}/{x.trial} passed"
