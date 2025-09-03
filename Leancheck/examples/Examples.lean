@@ -49,6 +49,9 @@ partial def myShrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Na
       loop (n / 2) best
   loop x (map x)
 
+partial def myNotShrinkNat (x : Nat) (_ : Nat → Bool) (map : Nat → Nat) : Nat :=
+  map x
+
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
 
@@ -65,11 +68,19 @@ def toEvenInt (x : Int) : Int :=
 def toEvenIntPair : (List Int × List Int) → (List Int × List Int) :=
   Prod.map (List.map toEvenInt) (List.map toEvenInt)
 
+def prop_shrinkNotGreaterNat (x : Nat) : Bool :=
+  let prop : Nat → Bool := fun y => y != 50
+  if prop x then
+    true
+  else
+    myShrinkNat x prop id ≤ x
+
 def main := do
   leanCheck (λ x => x * 1 = x * 2) (map := toEvenNat)
   leanCheck (λ x => x * 1 = x * 2) (map := toEvenInt)
   leanCheck (λ x => x + 1 = x + 1)
   leanCheck (λ x => x + 1 = x + 0) (shrinker := myShrinkNat)
+  leanCheck (λ x => x + 1 = x + 0) (shrinker := myNotShrinkNat)
   --leanCheck prop_float (λ x => x > 20) (trials := 500)
   --leanCheck prop_listRevRev
   --leanCheck prop_revConcat (map := toEvenIntPair)
@@ -77,5 +88,6 @@ def main := do
   --leanCheck prop_listRevRev (generator := some generate)
   leanCheck prop_addZeroInt (map := toEvenInt)
   leanCheck prop_intIdempotentcy
+  leanCheck prop_shrinkNotGreaterNat (shrinker := myShrinkNat)
 
 #eval main

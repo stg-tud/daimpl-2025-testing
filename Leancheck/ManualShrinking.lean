@@ -1,5 +1,5 @@
-def shrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Nat :=
-  let rec loop : Nat → Option Nat → Nat
+def shrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Option Nat :=
+  let rec loop : Nat → Option Nat → Option Nat
     | 0, best =>
       let y0 := map 0
       let best := if ¬ prop y0 ∧ (y0 < best.getD x) then some y0 else best
@@ -8,25 +8,25 @@ def shrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Nat :=
       let y := map (n+1)
       let best := if ¬ prop y ∧ (y < best.getD x) then some y else best
       loop n best
-  loop x (map x)
+  loop x none
 
-def shrinkInt (x : Int) (prop : Int → Bool) (map : Int → Int) : Int :=
+def shrinkInt (x : Int) (prop : Int → Bool) (map : Int → Int) : Option Int :=
   let s : Int := if x ≥ 0 then (1 : Int) else (-1)
-  let rec loop : Nat → Int → Int
+  let rec loop : Nat → Option Int → Option Int
     | 0, best =>
       let y0 := map 0
-      let best := if ¬ prop y0 ∧ (Int.natAbs y0 < Int.natAbs best) then y0 else best
+      let best := if ¬ prop y0 ∧ (Int.natAbs y0 < Int.natAbs (best.getD x)) then some y0 else best
       best
     | (k+1), best =>
       let cand : Int := s * Int.ofNat (k+1)
       let y := map cand
-      let best := if ¬ prop y ∧ (Int.natAbs y < Int.natAbs best) then y else best
+      let best := if ¬ prop y ∧ (Int.natAbs y < Int.natAbs (best.getD x)) then some y else best
       loop k best
-  loop (Int.natAbs x) (map x)
+  loop (Int.natAbs x) none
 
 def shrinkPair {α β : Type}
-  (shrA : α → (α → Bool) → (α → α) → α)
-  (shrB : β → (β → Bool) → (β → β) → β)
+  (shrA : α → (α → Bool) → (α → α) → Option α)
+  (shrB : β → (β → Bool) → (β → β) → Option β)
   (p : α × β)
   (prop : (α × β) → Bool)
   (map  : (α × β) → (α × β)) : α × β :=
@@ -36,7 +36,7 @@ def shrinkPair {α β : Type}
   let mapA  : α → α    := fun a' => (map (a', b)).fst
   let a' := shrA a propA mapA
   let candA := (a', b)
-  let y := (map candA)
+  let y := (map (candA.getD (a, b)))
   if ¬ prop y then
     y
   else
@@ -49,7 +49,7 @@ def shrinkPair {α β : Type}
 
 
 class ManualShrinking (α : Type) where
-  shrink : α → (prop : α → Bool) → (map : α → α) → α
+  shrink : α → (prop : α → Bool) → (map : α → α) → Option α
 
 instance : ManualShrinking Bool where
   shrink n _ _ := n

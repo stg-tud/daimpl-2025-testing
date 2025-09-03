@@ -17,32 +17,30 @@ deriving Inhabited
 /-
   Main method to check a property of a function
 -/
-partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
+def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
   (map : α → α := id)
   (generatorFunc : StdGen → α × StdGen)
   (shrinkingFunc : α → (prop : α → Bool) → (map : α → α) → α)
-  (g : StdGen)
-  (trials : Nat := 100)
-  (iteration : Nat := 0) : TestOutput α := Id.run do
+  (g0 : StdGen)
+  (trials : Nat) : TestOutput α :=
 
-  -- Check if done
-  if iteration = trials then return { trial := trials, iter := iteration }
-
-  -- Get generator and value
-  let (x, g') := generatorFunc g
-  let y := map x
-
-  -- Check property
-    if ¬ prop y then
-      let ex : TestOutput α := { trial := trials, ex := some y }
-
-      if ¬ prop (shrinkingFunc x prop map) then
-        return {ex with shrink := some (shrinkingFunc x prop map)}
+  let rec loop : Nat → StdGen → TestOutput α
+    -- Check if done
+    | 0, _ =>
+      { trial := trials, iter := trials }
+    | (n+1), g =>
+      -- Get generator and value
+      let (x, g') := generatorFunc g
+      let y := map x
+      -- Check property
+      if ¬ prop y then
+        let iteration := trials - (n+1)
+        let shrinked := shrinkingFunc x prop map
+        { trial := trials, iter := iteration, ex := some y, shrink := shrinked }
       else
-        return ex
-    else
-      leanCheckCore prop map generatorFunc shrinkingFunc g' trials (iteration + 1)
+        loop n g'
+  loop trials g0
 
 /-
   Parse TestOutput and print human-readable version
@@ -65,4 +63,4 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   let generatorFunc := generator.getD Arbitrary.generate
   let shrinkingFunc := shrinker.getD ManualShrinking.shrink
 
-  parseTestOutput $ leanCheckCore prop map generatorFunc shrinkingFunc g trials (iteration := 0)
+  parseTestOutput $ leanCheckCore prop map generatorFunc shrinkingFunc g trials
