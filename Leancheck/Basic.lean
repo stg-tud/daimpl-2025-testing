@@ -46,11 +46,25 @@ def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
 -/
 def parseTestOutput {α : Type} (name : String) (x : TestOutput α) [ToString α] : IO Unit :=
   match x with
-  | { trial := _ , iter := _ , ex := _      , shrink := _ , timeout := true } => IO.println s!"Failure \"{name}\": Tests have timed out. {x.iter}/{x.trial} have been tested"
-  | { trial := _ , iter := _ , ex := none   , shrink := _ , timeout := false}      => IO.println s!"Success \"{name}\": {x.iter}/{x.trial} passed"
-  | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure \"{name}\": Counterexample {a} found, not shrinkable"
-  | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure \"{name}\": Counterexample {a} found, shrinkable to {b}"
+  | { trial := _ , iter := _ , ex := _      , shrink := _      , timeout := true } => IO.println s!"Failure \"{name}\": Tests have timed out. {x.iter}/{x.trial} have been tested"
+  | { trial := _ , iter := _ , ex := none   , shrink := _      , timeout := false} => IO.println s!"Success \"{name}\": {x.iter}/{x.trial} passed"
+  | { trial := _ , iter := _ , ex := some a , shrink := none   , timeout := false} => IO.println s!"Failure \"{name}\": Counterexample {a} found, not shrinkable"
+  | { trial := _ , iter := _ , ex := some a , shrink := some b , timeout := false} => IO.println s!"Failure \"{name}\": Counterexample {a} found, shrinkable to {b}"
 
+/-
+  Evaluate test output
+-/
+def evalTestOutput {α : Type} (c : TestOutput α) : Bool :=
+  match c with
+  | { trial := _ , iter := _ , ex := _      , shrink := _       , timeout := true } => false
+  | { trial := _ , iter := _ , ex := none   , shrink := _       , timeout := false} => true
+  | { trial := _ , iter := _ , ex := some _ , shrink := none    , timeout := false} => false
+  | { trial := _ , iter := _ , ex := some _ , shrink := some _  , timeout := false} => false
+
+
+/-
+  Evaluate a singular
+-/
 def leanCheck {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (name : String)
   (prop : α → Bool)
@@ -65,3 +79,17 @@ def leanCheck {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   let shrinkingFunc := shrinker.getD ManualShrinking.shrink
 
   parseTestOutput name $ leanCheckCore prop map generatorFunc shrinkingFunc g trials
+
+def postulate {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
+  (prop : α → Bool)
+  (map : α → α := id)
+  (generator : (Option (StdGen → α × StdGen)) := none)
+  (shrinker : (Option (α → (prop : α → Bool) → (map : α → α) → Option α)) := none)
+  (trials : Nat := 100)
+  (seed : Nat := 0) : Prop := 
+
+  let g := mkStdGen seed
+  let generatorFunc := generator.getD Arbitrary.generate
+  let shrinkingFunc := shrinker.getD ManualShrinking.shrink
+
+  evalTestOutput $ leanCheckCore prop map generatorFunc shrinkingFunc g trials

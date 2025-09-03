@@ -62,3 +62,5 @@ def main (args : List String) := do
   | "lambda" :: args => testLambda; main args
   | "prop" :: args => testProp; main args
   | _ => testLambda; testProp
+
+#eval main ["lambda", "prop"]
