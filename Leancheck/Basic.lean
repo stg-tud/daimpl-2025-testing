@@ -13,7 +13,6 @@ structure TestOutput (α : Type) where
   timeout : Bool     := false
 deriving Inhabited
 
--- TODO: Prove termination
 /-
   Main method to check a property of a function
 -/
@@ -21,7 +20,7 @@ def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
   (map : α → α := id)
   (generatorFunc : StdGen → α × StdGen)
-  (shrinkingFunc : α → (prop : α → Bool) → (map : α → α) → α)
+  (shrinkingFunc : α → (prop : α → Bool) → (map : α → α) → Option α)
   (g0 : StdGen)
   (trials : Nat) : TestOutput α :=
 
@@ -56,7 +55,7 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
   (map : α → α := id)
   (generator : (Option (StdGen → α × StdGen)) := none)
-  (shrinker : (Option (α → (prop : α → Bool) → (map : α → α) → α)) := none)
+  (shrinker : (Option (α → (prop : α → Bool) → (map : α → α) → Option α)) := none)
   (trials : Nat := 100) : IO Unit := do
 
   let g := mkStdGen

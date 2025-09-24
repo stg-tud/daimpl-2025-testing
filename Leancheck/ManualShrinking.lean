@@ -3,7 +3,7 @@ def shrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Option Nat :
     | 0, best =>
       let y0 := map 0
       let best := if ¬ prop y0 ∧ (y0 < best.getD x) then some y0 else best
-      best.getD x
+      best
     | (n+1), best =>
       let y := map (n+1)
       let best := if ¬ prop y ∧ (y < best.getD x) then some y else best
@@ -34,15 +34,15 @@ def shrinkPair {α β : Type}
 
   let propA : α → Bool := fun a' => prop (map (a', b))
   let mapA  : α → α    := fun a' => (map (a', b)).fst
-  let a' := shrA a propA mapA
+  let a' := (shrA a propA mapA).getD a
   let candA := (a', b)
-  let y := (map (candA.getD (a, b)))
+  let y := (map candA)
   if ¬ prop y then
     y
   else
     let propB : β → Bool := fun b' => prop (map (a, b'))
     let mapB  : β → β    := fun b' => (map (a, b')).snd
-    let b' := shrB b propB mapB
+    let b' := (shrB b propB mapB).getD b
     let candB := (a, b')
     let y := (map candB)
     if ¬ prop y then y else p

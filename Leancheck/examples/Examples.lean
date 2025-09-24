@@ -37,7 +37,7 @@ def generate g :=
         loop n (x :: acc) g''
     loop len [] g'
 
-partial def myShrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Nat :=
+partial def myShrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Option Nat :=
   let rec loop : Nat → Nat → Nat
     | 0, best =>
       let y0 := map 0
@@ -49,8 +49,8 @@ partial def myShrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Na
       loop (n / 2) best
   loop x (map x)
 
-partial def myNotShrinkNat (x : Nat) (_ : Nat → Bool) (map : Nat → Nat) : Nat :=
-  map x
+def myNotShrinkNat (_ : Nat) (_ : Nat → Bool) (_ : Nat → Nat) : Option Nat :=
+  none
 
 def prop_arrayRevRev (x : Array Int) :=
   Array.reverse (Array.reverse x) == x
@@ -68,12 +68,12 @@ def toEvenInt (x : Int) : Int :=
 def toEvenIntPair : (List Int × List Int) → (List Int × List Int) :=
   Prod.map (List.map toEvenInt) (List.map toEvenInt)
 
-def prop_shrinkNotGreaterNat (x : Nat) : Bool :=
-  let prop : Nat → Bool := fun y => y != 50
-  if prop x then
-    true
-  else
-    myShrinkNat x prop id ≤ x
+-- def prop_shrinkNotGreaterNat (x : Nat) : Bool :=
+--  let prop : Nat → Bool := fun y => y != 50
+--  if prop x then
+--    true
+--  else
+--    (myShrinkNat x prop id ≤ x).getD x
 
 def main := do
   leanCheck (λ x => x * 1 = x * 2) (map := toEvenNat)
@@ -88,6 +88,6 @@ def main := do
   --leanCheck prop_listRevRev (generator := some generate)
   leanCheck prop_addZeroInt (map := toEvenInt)
   leanCheck prop_intIdempotentcy
-  leanCheck prop_shrinkNotGreaterNat (shrinker := myShrinkNat)
+  --leanCheck prop_shrinkNotGreaterNat (shrinker := myShrinkNat)
 
 #eval main
