@@ -56,9 +56,10 @@ def leanCheck {α: Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (map : α → α := id)
   (generator : (Option (StdGen → α × StdGen)) := none)
   (shrinker : (Option (α → (prop : α → Bool) → (map : α → α) → Option α)) := none)
-  (trials : Nat := 100) : IO Unit := do
+  (trials : Nat := 100)
+  (seed : Nat := 0) : IO Unit := do
 
-  let g := mkStdGen
+  let g := mkStdGen seed
   let generatorFunc := generator.getD Arbitrary.generate
   let shrinkingFunc := shrinker.getD ManualShrinking.shrink
 
