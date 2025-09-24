@@ -6,14 +6,14 @@ import Leancheck.ManualShrinking
 open Std
 
 structure TestOutput (α : Type) where
-  trial    : Nat      := 0
+  trial   : Nat      := 0
   iter    : Nat      := 0
   ex      : Option α := none
   shrink  : Option α := none
   timeout : Bool     := false
 deriving Inhabited
 
-/-
+/--
   Main method to check a property of a function
 -/
 def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
@@ -41,7 +41,7 @@ def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
         loop n g'
   loop trials g0
 
-/-
+/--
   Parse TestOutput and print human-readable version
 -/
 def parseTestOutput{α: Type} (x : TestOutput α) [ToString α] : IO Unit :=
