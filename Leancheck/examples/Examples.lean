@@ -83,9 +83,9 @@ def main := do
   leanCheck (λ x => x + 1 = x + 0) (shrinker := myNotShrinkNat)
   --leanCheck prop_float (λ x => x > 20) (trials := 500)
   --leanCheck prop_listRevRev
-  --leanCheck prop_revConcat (map := toEvenIntPair)
-  --leanCheck prop_arrayRevRev
-  --leanCheck prop_listRevRev (generator := some generate)
+  leanCheck prop_revConcat (map := toEvenIntPair)
+  leanCheck prop_arrayRevRev
+  leanCheck prop_listRevRev (generator := some generate)
   leanCheck prop_addZeroInt (map := toEvenInt)
   leanCheck prop_intIdempotentcy
   --leanCheck prop_shrinkNotGreaterNat (shrinker := myShrinkNat)
