@@ -19,20 +19,6 @@ def randomFloat (g : StdGen) : Float × StdGen :=
   let floatVal : Float := n.toFloat / (2 ^ 64).toFloat
   (floatVal, g')
 
--- without tail recursion
-/-
-def randList {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : List α × StdGen :=
-    let (len, g) := randNatInRange g 0 10
-    let rec aux : (n : Nat) → (g : StdGen) → List α × StdGen
-      | 0, g => ([], g)
-      | n + 1, g =>
-        let (x, g1) := gen g
-        let (xs, g2) := aux n g1
-        (x :: xs, g2)
-    aux len g
--/
-
--- with tail recursion
 def randList {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : List α × StdGen :=
   let (len, g') := randNat g 0 10
   let rec loop (n : Nat) (acc : List α) (g : StdGen) : List α × StdGen :=
