@@ -1,6 +1,20 @@
 name = "leancheck"
 version = "0.1.0"
 defaultTargets = ["leancheck"]
+description = "QuickCheck-style property testing for Lean 4"
+license = "EUPL-1.2"
+readme = "README.md"
+keywords = [
+  "testing",
+  "property-based testing",
+  "property-based-testing",
+  "property testing",
+  "quickcheck",
+  "shrinking",
+  "lean4"
+]
+repository = "https://github.com/stg-tud/daimpl-2025-testing"
+reservoir = true
 
 testDriver = "Examples"
 
@@ -10,4 +24,3 @@ name = "Leancheck"
 [[lean_exe]]
 name = "Examples"
 srcDir = "Leancheck/examples"
-
