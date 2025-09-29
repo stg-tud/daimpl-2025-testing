@@ -47,15 +47,15 @@ def generate g :=
 
 -- Define test suites as functions
 def testLambda := do
-  check "True lambda" (λ x => x + 1 = x + 1)
-  check "False lambda" (λ x => x + 1 = x + 0)
+  leanCheck "True lambda" (λ x => x + 1 = x + 1)
+  leanCheck "False lambda" (λ x => x + 1 = x + 0)
 
 def testProp := do
-  check "Float" prop_float (λ x => x > 20) (trials := 500)
-  check "Lists" prop_listRevRev
-  check "Pair of lists" prop_revConcat
-  check "Array of int" prop_arrayRevRev
-  check "Other generator" prop_listRevRev (generator := some generate)
+  leanCheck "Float" prop_float (λ x => x > 20) (trials := 500)
+  leanCheck "Lists" prop_listRevRev
+  leanCheck "Pair of lists" prop_revConcat
+  leanCheck "Array of int" prop_arrayRevRev
+  leanCheck "Other generator" prop_listRevRev (generator := some generate)
 
 def main (args : List String) := do
   match args with
