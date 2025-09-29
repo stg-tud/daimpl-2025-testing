@@ -51,7 +51,6 @@ def testLambda := do
   leanCheck "False lambda" (λ x => x + 1 = x + 0)
 
 def testProp := do
-  leanCheck "Float" prop_float (λ x => x > 20) (trials := 500)
   leanCheck "Lists" prop_listRevRev
   leanCheck "Pair of lists" prop_revConcat
   leanCheck "Array of int" prop_arrayRevRev

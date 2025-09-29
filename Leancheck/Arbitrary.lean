@@ -2,37 +2,36 @@
 Generates a random `Int` in the interval `[lo, hi]` using the given `StdGen`.
 
 Returns a pair `(x, g')` where:
-- `x` is the random natural in the desired range
+- `x` is the random integer in the desired range
 - `g'` is the updated random generator
 -/
 def randIntInRange (g : StdGen) (lo hi : Int) : Int × StdGen :=
-  if lo > hi then
-    panic! s!"Invalid range: lo = {lo}, hi = {hi}"
-  else
-    let diff : Nat := (hi - lo).toNat
-    let (n, g') : Nat × StdGen := randNat g 0 diff
-    let n' : Int := n + lo
-    (n', g')
+  let lo' := if lo ≤ hi then lo else hi
+  let hi' := if lo ≤ hi then hi else lo
+  let diff : Nat := (hi' - lo').toNat
+  let (n, g') : Nat × StdGen := randNat g 0 diff
+  let n' : Int := n + lo'
+  (n', g')
+
+/--
+Generates a random `Float` using the given `StdGen`.
+
+The value is obtained by drawing a `Nat` in `[0, 2^64]` and dividing by `2^64`,
+so the result lies in `[0.0, 1.0]`. Returns `(x, g')`.
+-/
 
 def randomFloat (g : StdGen) : Float × StdGen :=
   let (n, g') := randNat g 0 (2 ^ 64)
   let floatVal : Float := n.toFloat / (2 ^ 64).toFloat
   (floatVal, g')
 
--- without tail recursion
-/-
-def randList {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : List α × StdGen :=
-    let (len, g) := randNatInRange g 0 10
-    let rec aux : (n : Nat) → (g : StdGen) → List α × StdGen
-      | 0, g => ([], g)
-      | n + 1, g =>
-        let (x, g1) := gen g
-        let (xs, g2) := aux n g1
-        (x :: xs, g2)
-    aux len g
--/
+/--
+Generates a random `List α` using the given element generator `gen` and `StdGen`.
 
--- with tail recursion
+- First draws a length `len ∈ [0, 10]`.
+- Then produces `len` elements by repeatedly calling `gen`, threading the RNG.
+Returns `(xs, g')`.
+-/
 def randList {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : List α × StdGen :=
   let (len, g') := randNat g 0 10
   let rec loop (n : Nat) (acc : List α) (g : StdGen) : List α × StdGen :=
@@ -43,6 +42,13 @@ def randList {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : List α 
       loop n (x :: acc) g''
   loop len [] g'
 
+/--
+Generates a random `Array α` using the given element generator `gen` and `StdGen`.
+
+- First draws a length `len ∈ [0, 10]`.
+- Then produces `len` elements by repeatedly calling `gen`, threading the RNG.
+Returns `(arr, g')`.
+-/
 def randArray {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : Array α × StdGen :=
   let (len, g') := randNat g 0 10
   let rec loop (n : Nat) (acc : Array α) (g : StdGen) : Array α × StdGen :=
@@ -53,6 +59,12 @@ def randArray {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : Array �
       loop n (acc.push x) g''
   loop len #[] g'
 
+/--
+Generates a random `Option α` using the given element generator `gen` and `StdGen`.
+
+- Flips a random boolean; if `true`, generates `some x` via `gen`, else `none`.
+Returns `(opt, g')`.
+-/
 def randOptional {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : Option α × StdGen :=
   let (b, g') := randBool g
   if b then
@@ -61,6 +73,12 @@ def randOptional {α : Type} (gen : StdGen → α × StdGen) (g : StdGen) : Opti
   else
     (none, g')
 
+/--
+Generates a random pair `(α × β)` using element generators `genA`, `genB` and `StdGen`.
+
+- Draws `a` with `genA`, then `b` with `genB`, threading the RNG.
+Returns `((a, b), g')`.
+-/
 def randPair {α β : Type} (genA : StdGen → α × StdGen) (genB : StdGen → β × StdGen) (g : StdGen) : (α × β) × StdGen :=
   let (a, g1) := genA g
   let (b, g2) := genB g1

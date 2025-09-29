@@ -1,73 +1,67 @@
 import Std
 
 import Leancheck.Arbitrary
-import Leancheck.Shrinking
+import Leancheck.ManualShrinking
 
 open Std
 
 structure TestOutput (α : Type) where
-  trial    : Nat      := 0
+  trial   : Nat      := 0
   iter    : Nat      := 0
   ex      : Option α := none
   shrink  : Option α := none
   timeout : Bool     := false
 deriving Inhabited
 
--- TODO: Prove termination
-/-
+/--
   Main method to check a property of a function
 -/
-partial def leanCheckCore {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (prop : α → Bool)
-  (cond : α → Bool := λ _ => true)
+  (map : α → α := id)
   (generatorFunc : StdGen → α × StdGen)
-  (g : StdGen)
-  (trials : Nat := 100)
-  (iteration : Nat := 0)
-  (fails : Nat := 0) : TestOutput α := Id.run do
+  (shrinkingFunc : α → (prop : α → Bool) → (map : α → α) → Option α)
+  (g0 : StdGen)
+  (trials : Nat) : TestOutput α :=
 
-  -- Check if done
-  if iteration = trials then return { trial := trials, iter := iteration }
-
-  -- Get generator and value
-  let (x, g') := generatorFunc g
-
-  -- Check conditional
-  if ¬ cond x then
-    if fails = 5 then
-      return { trial := trials, iter := iteration, timeout := true}
-    else
-      leanCheckCore prop cond generatorFunc g' (trials + 1) iteration (fails + 1)
-  else
-    -- Check property
-    if ¬ prop x then
-      let ex : TestOutput α := { trial := trials, ex := some x }
-
-      if ¬ prop (Shrinking.shrink x) then
-        return {ex with shrink := some (Shrinking.shrink x)}
+  let rec loop : Nat → StdGen → TestOutput α
+    -- Check if done
+    | 0, _ =>
+      { trial := trials, iter := trials }
+    | (n+1), g =>
+      -- Get generator and value
+      let (x, g') := generatorFunc g
+      let y := map x
+      -- Check property
+      if ¬ prop y then
+        let iteration := trials - (n+1)
+        let shrinked := shrinkingFunc x prop map
+        { trial := trials, iter := iteration, ex := some y, shrink := shrinked }
       else
-        return ex
-    else
-      leanCheckCore prop cond generatorFunc g' trials (iteration + 1)
+        loop n g'
+  loop trials g0
 
-/-
+/--
   Parse TestOutput and print human-readable version
 -/
-def parseTestOutput (name : String) (x : TestOutput α) [ToString α] : IO Unit :=
+def parseTestOutput {α : Type} (name : String) (x : TestOutput α) [ToString α] : IO Unit :=
   match x with
   | { trial := _ , iter := _ , ex := _      , shrink := _ , timeout := true } => IO.println s!"Failure \"{name}\": Tests have timed out. {x.iter}/{x.trial} have been tested"
   | { trial := _ , iter := _ , ex := none   , shrink := _ , timeout := false}      => IO.println s!"Success \"{name}\": {x.iter}/{x.trial} passed"
   | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure \"{name}\": Counterexample {a} found, not shrinkable"
   | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure \"{name}\": Counterexample {a} found, shrinkable to {b}"
 
-def leanCheck {α: Type} [Arbitrary α] [ToString α] [Shrinking α]
+def leanCheck {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (name : String)
   (prop : α → Bool)
-  (cond : α → Bool := λ _ => true)
+  (map : α → α := id)
   (generator : (Option (StdGen → α × StdGen)) := none)
-  (trials : Nat := 100) : IO Unit := do
+  (shrinker : (Option (α → (prop : α → Bool) → (map : α → α) → Option α)) := none)
+  (trials : Nat := 100)
+  (seed : Nat := 0) : IO Unit := do
 
-  let g := mkStdGen
-  let gen := generator.getD Arbitrary.generate
+  let g := mkStdGen seed
+  let generatorFunc := generator.getD Arbitrary.generate
+  let shrinkingFunc := shrinker.getD ManualShrinking.shrink
 
-  parseTestOutput name $ leanCheckCore prop cond gen g trials (iteration := 0) (fails := 0)
+  parseTestOutput name $ leanCheckCore prop map generatorFunc shrinkingFunc g trials
