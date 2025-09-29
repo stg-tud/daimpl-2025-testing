@@ -8,7 +8,7 @@ import Std
 
 open Std
 
--- Define properties or custom generators
+-- Properties defined prior
 def prop_addZeroNat (x : Nat) : Bool :=
   x + 0 == x
 
@@ -27,6 +27,14 @@ def prop_float (x : Float) :=
 def prop_listRevRev (x : List Int) :=
   List.reverse (List.reverse x) == x
 
+def prop_arrayRevRev (x : Array Int) :=
+  Array.reverse (Array.reverse x) == x
+
+def prop_revConcat (x: List Int × List Int) :=
+  let (x1, x2) := x
+  List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
+
+-- Custom generator
 def generate g :=
     let (len, g') := randNat g 0 2
     let rec loop (n : Nat) (acc : List Int) (g : StdGen) : List Int × StdGen :=
@@ -37,57 +45,21 @@ def generate g :=
         loop n (x :: acc) g''
     loop len [] g'
 
-partial def myShrinkNat (x : Nat) (prop : Nat → Bool) (map : Nat → Nat) : Option Nat :=
-  let rec loop : Nat → Nat → Nat
-    | 0, best =>
-      let y0 := map 0
-      let best := if ¬ prop y0 ∧ (y0 < best) then y0 else best
-      best
-    | n, best =>
-      let y := map n
-      let best := if ¬ prop y ∧ (y < best) then y else best
-      loop (n / 2) best
-  loop x (map x)
+-- Define test suites as functions
+def testLambda := do
+  leanCheck "True lambda" (λ x => x + 1 = x + 1)
+  leanCheck "False lambda" (λ x => x + 1 = x + 0)
 
-def myNotShrinkNat (_ : Nat) (_ : Nat → Bool) (_ : Nat → Nat) : Option Nat :=
-  none
+def testProp := do
+  leanCheck "Float" prop_float (λ x => x > 20) (trials := 500)
+  leanCheck "Lists" prop_listRevRev
+  leanCheck "Pair of lists" prop_revConcat
+  leanCheck "Array of int" prop_arrayRevRev
+  leanCheck "Other generator" prop_listRevRev (generator := some generate)
 
-def prop_arrayRevRev (x : Array Int) :=
-  Array.reverse (Array.reverse x) == x
-
-def prop_revConcat (x: List Int × List Int) :=
-  let (x1, x2) := x
-  List.reverse (x1 ++ x2) == List.reverse x1 ++ List.reverse x2
-
-def toEvenNat (x : Nat) : Nat :=
-  x * 2
-
-def toEvenInt (x : Int) : Int :=
-  x * 2
-
-def toEvenIntPair : (List Int × List Int) → (List Int × List Int) :=
-  Prod.map (List.map toEvenInt) (List.map toEvenInt)
-
--- def prop_shrinkNotGreaterNat (x : Nat) : Bool :=
---  let prop : Nat → Bool := fun y => y != 50
---  if prop x then
---    true
---  else
---    (myShrinkNat x prop id ≤ x).getD x
-
-def main := do
-  leanCheck (λ x => x * 1 = x * 2) (map := toEvenNat)
-  leanCheck (λ x => x * 1 = x * 2) (map := toEvenInt)
-  leanCheck (λ x => x + 1 = x + 1)
-  leanCheck (λ x => x + 1 = x + 0) (shrinker := myShrinkNat)
-  leanCheck (λ x => x + 1 = x + 0) (shrinker := myNotShrinkNat)
-  --leanCheck prop_float (λ x => x > 20) (trials := 500)
-  --leanCheck prop_listRevRev
-  leanCheck prop_revConcat (map := toEvenIntPair)
-  leanCheck prop_arrayRevRev
-  leanCheck prop_listRevRev (generator := some generate)
-  leanCheck prop_addZeroInt (map := toEvenInt)
-  leanCheck prop_intIdempotentcy
-  --leanCheck prop_shrinkNotGreaterNat (shrinker := myShrinkNat)
-
-#eval main
+def main (args : List String) := do
+  match args with
+  | [] => return
+  | "lambda" :: args => testLambda; main args
+  | "prop" :: args => testProp; main args
+  | _ => testLambda; testProp
