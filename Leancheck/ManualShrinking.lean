@@ -24,7 +24,7 @@ def shrinkInt (x : Int) (prop : Int → Bool) (map : Int → Int) : Option Int :
       loop k best
   loop (Int.natAbs x) none
 
-partial def shrinkList {α : Type}
+def shrinkList {α : Type}
   (xs : List α)
   (prop : List α → Bool)
   (map : List α → List α) : Option (List α) :=
@@ -33,54 +33,58 @@ partial def shrinkList {α : Type}
   if prop yx then
     none
   else
-    let rec loop (cur : List α) : List α :=
-      let yc := map cur
-      let n  := cur.length
-      if n ≤ 1 then
-        yc
-      else
-        let k     := n / 2
-        let left  := cur.take k
-        let right := cur.drop k
-        let yL    := map left
-        if ¬ prop yL then
-          loop left
+     let rec loop : Nat → List α → List α
+      | 0, cur => map cur
+      | len + 1, cur =>
+        let yc := map cur
+        let n  := cur.length
+        if n ≤ 1 then
+          yc
         else
-          let yR := map right
-          if ¬ prop yR then
-            loop right
+          let k     := n / 2
+          let left  := cur.take k
+          let right := cur.drop k
+          let yL    := map left
+          if ¬ prop yL then
+            loop len left
           else
-            yc
-    some (loop xs)
+            let yR := map right
+            if ¬ prop yR then
+              loop len right
+            else
+              yc
+    some (loop xs.length xs)
 
-partial def shrinkArray {α : Type}
-  (xs : Array α)
+def shrinkArray {α : Type}
+  (xs  : Array α)
   (prop : Array α → Bool)
-  (map : Array α → Array α) : Option (Array α) :=
+  (map  : Array α → Array α) : Option (Array α) :=
 
   let yx := map xs
   if prop yx then
     none
   else
-    let rec loop (cur : Array α) : Array α :=
-      let yc := map cur
-      let n  := cur.size
-      if n ≤ 1 then
-        yc
-      else
-        let k     := n / 2
-        let left  := cur.extract 0 k
-        let right := cur.extract k n
-        let yL    := map left
-        if ¬ prop yL then
-          loop left
+    let rec loop : Nat → Array α → Array α
+      | 0, cur => map cur
+      | len + 1, cur =>
+        let yc := map cur
+        let n  := cur.size
+        if n ≤ 1 then
+          yc
         else
-          let yR := map right
-          if ¬ prop yR then
-            loop right
+          let k     := n / 2
+          let left  := cur.extract 0 k
+          let right := cur.extract k n
+          let yL    := map left
+          if ¬ prop yL then
+            loop len left
           else
-            yc
-    some (loop xs)
+            let yR := map right
+            if ¬ prop yR then
+              loop len right
+            else
+              yc
+    some (loop xs.size xs)
 
 def shrinkOption {α : Type}
   (x : Option α)
