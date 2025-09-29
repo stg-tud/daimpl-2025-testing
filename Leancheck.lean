@@ -2,4 +2,4 @@
 -- Import modules here that should be built as part of the library.
 import Leancheck.Basic
 import Leancheck.Arbitrary
-import Leancheck.Shrinking
+import Leancheck.ManualShrinking
