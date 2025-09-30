@@ -62,3 +62,19 @@ def main (args : List String) := do
   | "lambda" :: args => testLambda; main args
   | "prop" :: args => testProp; main args
   | _ => testLambda; testProp
+
+set_option guard_msgs.diff true in
+/--
+info: Success "True lambda": 100/100 passed
+Failure "False lambda": Counterexample 77 found, shrinkable to 0
+-/
+#guard_msgs in #eval main ["lambda"]
+
+set_option guard_msgs.diff true in
+/--
+info: Success "Lists": 100/100 passed
+Failure "Pair of lists": Counterexample ([57, -85, -42, -15, 53, 47, 28], [-79, -21, -50, 80]) found, shrinkable to ([57], [-79, -21, -50, 80])
+Success "Array of int": 100/100 passed
+Success "Other generator": 100/100 passed
+-/
+#guard_msgs in #eval main ["prop"]
