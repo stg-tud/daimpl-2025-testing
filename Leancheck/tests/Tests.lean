@@ -261,6 +261,27 @@ def main : IO Unit := do
 
   checkPass "prop_nat_true" outNatTrue 100
 
+  let outNatEvenFalse :=
+    leanCheckCore
+      prop_nat_false
+      (fun x => x * 2)
+      Arbitrary.generate
+      ManualShrinking.shrink
+      g0
+      100
+
+  checkFail "prop_nat_false" prop_nat_false outNatEvenFalse (fun shr ex => shr ≤ ex && shr % 2 == 0 && ex % 2 == 0)
+
+  let outNatEvenTrue :=
+    leanCheckCore
+      prop_nat_true
+      (fun x => x * 2)
+      Arbitrary.generate
+      ManualShrinking.shrink
+      g0
+      100
+
+  checkPass "prop_nat_true" outNatEvenTrue 100
   let outIntFalse :=
     leanCheckCore
       prop_int_false
