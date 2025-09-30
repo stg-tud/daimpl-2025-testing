@@ -14,18 +14,6 @@ def randIntInRange (g : StdGen) (lo hi : Int) : Int × StdGen :=
   (n', g')
 
 /--
-Generates a random `Float` using the given `StdGen`.
-
-The value is obtained by drawing a `Nat` in `[0, 2^64]` and dividing by `2^64`,
-so the result lies in `[0.0, 1.0]`. Returns `(x, g')`.
--/
-
-def randomFloat (g : StdGen) : Float × StdGen :=
-  let (n, g') := randNat g 0 (2 ^ 64)
-  let floatVal : Float := n.toFloat / (2 ^ 64).toFloat
-  (floatVal, g')
-
-/--
 Generates a random `List α` using the given element generator `gen` and `StdGen`.
 
 - First draws a length `len ∈ [0, 10]`.
@@ -96,9 +84,6 @@ instance : Arbitrary Nat where
 
 instance : Arbitrary Int where
   generate g := randIntInRange g (-100) 100
-
-instance : Arbitrary Float where
-  generate g := randomFloat g
 
 instance {α : Type} [Arbitrary α] : Arbitrary (List α) where
   generate g := randList Arbitrary.generate g

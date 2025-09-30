@@ -10,7 +10,6 @@ structure TestOutput (α : Type) where
   iter    : Nat      := 0
   ex      : Option α := none
   shrink  : Option α := none
-  timeout : Bool     := false
 deriving Inhabited
 
 /--
@@ -46,10 +45,9 @@ def leanCheckCore {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
 -/
 def parseTestOutput {α : Type} (name : String) (x : TestOutput α) [ToString α] : IO Unit :=
   match x with
-  | { trial := _ , iter := _ , ex := _      , shrink := _ , timeout := true } => IO.println s!"Failure \"{name}\": Tests have timed out. {x.iter}/{x.trial} have been tested"
-  | { trial := _ , iter := _ , ex := none   , shrink := _ , timeout := false}      => IO.println s!"Success \"{name}\": {x.iter}/{x.trial} passed"
-  | { trial := _ , iter := _ , ex := some a , shrink := none  , timeout := false}   => IO.println s!"Failure \"{name}\": Counterexample {a} found, not shrinkable"
-  | { trial := _ , iter := _ , ex := some a , shrink := some b  , timeout := false} => IO.println s!"Failure \"{name}\": Counterexample {a} found, shrinkable to {b}"
+  | { trial := _ , iter := _ , ex := none   , shrink := _}      => IO.println s!"Success \"{name}\": {x.iter}/{x.trial} passed"
+  | { trial := _ , iter := _ , ex := some a , shrink := none}   => IO.println s!"Failure \"{name}\": Counterexample {a} found, not shrinkable"
+  | { trial := _ , iter := _ , ex := some a , shrink := some b} => IO.println s!"Failure \"{name}\": Counterexample {a} found, shrinkable to {b}"
 
 def leanCheck {α : Type} [Arbitrary α] [ToString α] [ManualShrinking α]
   (name : String)

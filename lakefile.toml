@@ -16,7 +16,7 @@ keywords = [
 repository = "https://github.com/stg-tud/daimpl-2025-testing"
 reservoir = true
 
-testDriver = "Examples"
+testDriver = "Tests"
 
 [[lean_lib]]
 name = "Leancheck"
@@ -24,3 +24,11 @@ name = "Leancheck"
 [[lean_exe]]
 name = "Examples"
 srcDir = "Leancheck/examples"
+
+[[lean_exe]]
+name = "CustomStructureExample"
+srcDir = "Leancheck/examples"
+
+[[lean_exe]]
+name = "Tests"
+srcDir = "Leancheck/tests"
