@@ -11,7 +11,7 @@ def expectSome {α} (msg : String) : Option α → IO α
 | none   => throw <| IO.userError msg
 
 
-def g0 : StdGen := StdGen.mk 12345 67890
+def g0 : StdGen :=  mkStdGen 12345
 
 structure Pt where
   x : Int
