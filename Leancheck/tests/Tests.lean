@@ -389,4 +389,4 @@ def main (_ : List String) : IO Unit := do
     expect (¬ prop_triangleEqualityWrong s) "[B] shrink should still falsify"
     expect (sizeTriple s ≤ sizeTriple exVal) "[B] shrink should not increase size"
 
-  IO.println "Custom Pt generator/shrinker integration: OK"
+  IO.println "Tests: OK"
