@@ -1,6 +1,6 @@
 /-
-  This is a file containing some basic tests with the library
-  Either execute `lake test` for a comprehensive view or look into the source file
+  This is a file containing some basic examples with the library
+  Either execute `lake exe Examples` for a comprehensive view or look into the source file
 -/
 
 import Leancheck
@@ -46,11 +46,11 @@ def generate g :=
     loop len [] g'
 
 -- Define test suites as functions
-def testLambda := do
+def lambda := do
   leanCheck "True lambda" (λ x => x + 1 = x + 1)
   leanCheck "False lambda" (λ x => x + 1 = x + 0)
 
-def testProp := do
+def prop := do
   leanCheck "Lists" prop_listRevRev
   leanCheck "Pair of lists" prop_revConcat
   leanCheck "Array of int" prop_arrayRevRev
@@ -59,6 +59,6 @@ def testProp := do
 def main (args : List String) := do
   match args with
   | [] => return
-  | "lambda" :: args => testLambda; main args
-  | "prop" :: args => testProp; main args
-  | _ => testLambda; testProp
+  | "lambda" :: args => lambda; main args
+  | "prop" :: args => prop; main args
+  | _ => lambda; prop
