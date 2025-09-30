@@ -1,3 +1,8 @@
+/-
+  This is a file containing some basic tests with the library
+  Either execute `lake test` for a comprehensive view or look into the source file
+-/
+
 import Std
 import Leancheck
 
