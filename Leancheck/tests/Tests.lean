@@ -124,41 +124,41 @@ def sizeTriple (t : Pt × Pt × Pt) : Nat :=
 + (Int.natAbs b.x + Int.natAbs b.y)
 + (Int.natAbs c.x + Int.natAbs c.y)
 
-def prop_bool_false (x : Bool) : Bool :=
+def prop_boolFalse (x : Bool) : Bool :=
   x == True
 
-def prop_bool_true (x : Bool) : Bool :=
+def prop_boolTrue (x : Bool) : Bool :=
   x == x
 
-def prop_nat_false (x : Nat) : Bool :=
+def prop_natFalse (x : Nat) : Bool :=
   x == 1
 
-def prop_nat_true (x : Nat) : Bool :=
+def prop_natTrue (x : Nat) : Bool :=
   x == x
 
-def prop_int_false (x : Int) : Bool :=
+def prop_intFalse (x : Int) : Bool :=
   x == 1
 
-def prop_int_true (x : Int) : Bool :=
+def prop_intTrue (x : Int) : Bool :=
   x == x
 
-def prop_list_false (x : List Int) : Bool :=
+def prop_listFalse (x : List Int) : Bool :=
   x == List.reverse x
 
-def prop_list_true (x : List Int) : Bool :=
+def prop_listTrue (x : List Int) : Bool :=
   x == List.reverse (List.reverse x)
 
-def prop_array_false (x : Array Int) : Bool :=
+def prop_arrayFalse (x : Array Int) : Bool :=
   x == Array.reverse x
 
-def prop_array_true (x : Array Int) : Bool :=
+def prop_arrayTrue (x : Array Int) : Bool :=
   x == Array.reverse (Array.reverse x)
 
-def prop_pair_false (x : (Int × Int)) : Bool :=
+def prop_pairFalse (x : (Int × Int)) : Bool :=
   let (a, b) := x
   (a, b) == (b, a)
 
-def prop_pair_true (x : (Int × Int)) : Bool :=
+def prop_pairTrue (x : (Int × Int)) : Bool :=
   x == x
 
 def prop_L1MedianOptimal (t : Pt × Pt × Pt) : Bool :=
@@ -219,156 +219,156 @@ def noWorsePairInt (s e : Int × Int) : Bool :=
 def main : IO Unit := do
   let outBoolFalse :=
     leanCheckCore
-      prop_bool_false
+      prop_boolFalse
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_bool_false" prop_bool_false outBoolFalse (fun shr ex => shr ≤ ex)
+  checkFail "prop bool false" prop_boolFalse outBoolFalse (fun shr ex => shr ≤ ex)
 
   let outBoolTrue :=
     leanCheckCore
-      prop_bool_true
+      prop_boolTrue
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_bool_true" outBoolTrue 100
+  checkPass "prop bool true" outBoolTrue 100
 
   let outNatFalse :=
     leanCheckCore
-      prop_nat_false
+      prop_natFalse
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_nat_false" prop_nat_false outNatFalse (fun shr ex => shr ≤ ex)
+  checkFail "prop nat false" prop_natFalse outNatFalse (fun shr ex => shr ≤ ex)
 
   let outNatTrue :=
     leanCheckCore
-      prop_nat_true
+      prop_natTrue
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_nat_true" outNatTrue 100
+  checkPass "prop nat true" outNatTrue 100
 
   let outNatEvenFalse :=
     leanCheckCore
-      prop_nat_false
+      prop_natFalse
       (fun x => x * 2)
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_nat_false" prop_nat_false outNatEvenFalse (fun shr ex => shr ≤ ex && shr % 2 == 0 && ex % 2 == 0)
+  checkFail "prop nat false" prop_natFalse outNatEvenFalse (fun shr ex => shr ≤ ex && shr % 2 == 0 && ex % 2 == 0)
 
   let outNatEvenTrue :=
     leanCheckCore
-      prop_nat_true
+      prop_natTrue
       (fun x => x * 2)
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_nat_true" outNatEvenTrue 100
+  checkPass "prop nat true" outNatEvenTrue 100
   let outIntFalse :=
     leanCheckCore
-      prop_int_false
+      prop_intFalse
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_int_false" prop_int_false outIntFalse (fun shr ex => Int.natAbs shr ≤ Int.natAbs ex)
+  checkFail "prop int false" prop_intFalse outIntFalse (fun shr ex => Int.natAbs shr ≤ Int.natAbs ex)
 
   let outIntTrue :=
     leanCheckCore
-      prop_int_true
+      prop_intTrue
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_int_true" outIntTrue 100
+  checkPass "prop int true" outIntTrue 100
 
   let outListFalse :=
     leanCheckCore
-      prop_list_false
+      prop_listFalse
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_list_false" prop_list_false outListFalse (noWorseListMaxAbsLen)
+  checkFail "prop list false" prop_listFalse outListFalse (noWorseListMaxAbsLen)
 
   let outListTrue :=
     leanCheckCore
-      prop_list_true
+      prop_listTrue
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_list_true" outListTrue 100
+  checkPass "prop list true" outListTrue 100
 
   let outArrayFalse :=
     leanCheckCore
-      prop_array_false
+      prop_arrayFalse
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_array_false" prop_array_false outArrayFalse (noWorseArrayMaxAbsLen)
+  checkFail "prop array false" prop_arrayFalse outArrayFalse (noWorseArrayMaxAbsLen)
 
   let outArrayTrue :=
     leanCheckCore
-      prop_array_true
+      prop_arrayTrue
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_array_true" outArrayTrue 100
+  checkPass "prop array true" outArrayTrue 100
 
   let outPairFalse :=
     leanCheckCore (α := Int × Int)
-      prop_pair_false
+      prop_pairFalse
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkFail "prop_pair_false" prop_pair_false outPairFalse (noWorse := noWorsePairInt)
+  checkFail "prop pair false" prop_pairFalse outPairFalse (noWorse := noWorsePairInt)
 
   let outPairTrue :=
     leanCheckCore (α := Int × Int)
-      prop_pair_true
+      prop_pairTrue
       id
       Arbitrary.generate
       ManualShrinking.shrink
       g0
       100
 
-  checkPass "prop_pair_true" outPairTrue 100
+  checkPass "prop pair true" outPairTrue 100
 
 
   let outA :=
@@ -378,16 +378,9 @@ def main : IO Unit := do
       genPtTriple
       shrinkPtTriple
       g0
-      100
+      200
 
-  expect (outA.ex.isNone) "[A] L1-median: unexpected counterexample"
-  expect (outA.shrink.isNone) "[A] L1-median: shrink should be none when no failure"
-  expect (outA.iter == outA.trial) "[A] L1-median: expected to consume all trials"
-
-  expect (outA.trial == 100) "[A] L1-median: wrong trial count"
-
-  expect (outA.ex == none) "[A] L1-median: ex must be none on success"
-  expect (outA.shrink == none) "[A] L1-median: shrink must be none on success"
+  checkPass "prop l1 median optimal" outA 200
 
   let outB :=
   leanCheckCore
@@ -398,16 +391,7 @@ def main : IO Unit := do
     g0
     200
 
-  expect (outB.ex.isSome) "[B] expected a counterexample"
-  expect (outB.iter < outB.trial) "[B] should stop early on failure"
-  expect (outB.ex.isSome) "[B] expected a counterexample"
-  let exVal ← expectSome "[B] missing ex" outB.ex
-  expect (¬ prop_triangleEqualityWrong exVal) "[B] ex must falsify prop"
+  checkFail "prop triangle equality wrong" prop_triangleEqualityWrong outB (fun shr ex => sizeTriple shr ≤ sizeTriple ex)
 
-  match outB.shrink with
-  | none => pure ()
-  | some s =>
-    expect (¬ prop_triangleEqualityWrong s) "[B] shrink should still falsify"
-    expect (sizeTriple s ≤ sizeTriple exVal) "[B] shrink should not increase size"
 
   IO.println "Tests: OK"
