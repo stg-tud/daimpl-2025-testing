@@ -216,7 +216,7 @@ def noWorseArrayMaxAbsLen (s e : Array Int) : Bool :=
 def noWorsePairInt (s e : Int × Int) : Bool :=
   (Int.natAbs s.fst ≤ Int.natAbs e.fst) && (Int.natAbs s.snd ≤ Int.natAbs e.snd)
 
-def main (_ : List String) : IO Unit := do
+def main : IO Unit := do
   let outBoolFalse :=
     leanCheckCore
       prop_bool_false
