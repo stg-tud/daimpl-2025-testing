@@ -351,7 +351,7 @@ def main : IO Unit := do
 
 
   let outA :=
-    leanCheckCore (α := Pt × Pt × Pt)
+    leanCheckCore
       prop_L1MedianOptimal
       id
       genPtTriple
@@ -369,7 +369,7 @@ def main : IO Unit := do
   expect (outA.shrink == none) "[A] L1-median: shrink must be none on success"
 
   let outB :=
-  leanCheckCore (α := Pt × Pt × Pt)
+  leanCheckCore
     prop_triangleEqualityWrong
     id
     genPtTriple
