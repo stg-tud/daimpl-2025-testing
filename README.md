@@ -70,11 +70,11 @@ Execute `lake update` and your ready to go. `./Leancheck/examples` contains a ex
 
 ## Usage
 
-The entire test tooling depends on function `leancheck`. At minimum, a name and a property have to be provided. Optionally, you can provide the arguments decribed in the section "Implementation". Support for custom types, i.e., generator, mapping function and shrinker, must be implemented separately, also stated in the sections prior.
+The entire test tooling depends on the function `leancheck`. At minimum, a name and a property have to be provided. Optionally, you can provide the arguments decribed in the section "Implementation". Support for custom types, i.e., generator, mapping function and shrinker, must be implemented separately, also stated in the sections prior.
 
 For basic types you can just define a property, which is function that takes an argument of type α and returns a Bool (`prop : α → Bool`), and then pass it to the leanCheck function.
 
-If you want to use leanCheck for custom types you also have to define a generator and a shrinker. But you cannot just pass them as an argument to the leanCheck function. Instead you have define a typeclass instance of `Arbitrary` and `ManualShrinking` so that Lean can synthesize `[Arbitrary <CustomType>]` and `[ManualShrinking <CustomType>]`.
+If you want to use leanCheck for custom types you also have to define a generator and a shrinker. But you cannot just pass them as an argument to the leanCheck function. Instead you have to define a typeclass instance of `Arbitrary` and `ManualShrinking` so that Lean can synthesize `[Arbitrary <CustomType>]` and `[ManualShrinking <CustomType>]`.
 Let us look at an example.
 First we define an instance for the typeclass Arbitrary with the type Pt:
 ```haskell
@@ -104,7 +104,7 @@ instance : ManualShrinking Pt where
   shrink p prop map := shrinkPt p prop map    
 ```
 Now when we define a property using `Pt` we can just pass the property to `leanCheck` and Lean's instance search will automatically find the corresponding implementation just like for the basic types. For more details you can take a look at the examples in `Leancheck\examples\Examples.lean` and `Leancheck\examples\CustomStructureExample.lean`. Both can also be executed by running the commands `lake exe Examples prop`, `lake exe Examples lambda`, `lake exe Examples --` or `lake exe CustomStructureExample`.
-All the tests are in `Leancheck\tests\Tests.lean` can be executed by running the command `lake test`.
+All the tests are in `Leancheck\tests\Tests.lean` and can be executed by running the command `lake test`.
 
 
 ## About the Development Process
